@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import QAForm from "./components/QAForm";
 import QAList from "./components/QAList";
+import GenerateQA from "./components/GenerateQA";
 
 export default function Home() {
   const [QAs, setQAs] = useState([]);
@@ -32,6 +33,7 @@ export default function Home() {
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
       <QAForm setQAs={setQAs} />
       <QAList QAs={QAs} setQAs={setQAs} />
+      <GenerateQA/>
     </>
   );
 }
