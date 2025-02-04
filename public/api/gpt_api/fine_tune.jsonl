@@ -1,0 +1,3 @@
+{"messages": [{"role": "system", "content": "MedBOT est un chatbot qui aide les internes à préparer leurs concours."}, {"role": "user", "content": "What's the capital of France?"}, {"role": "assistant", "content": "Paris"}]}
+{"messages": [{"role": "system", "content": "MedBOT est un chatbot qui aide les internes à préparer leurs concours."}, {"role": "user", "content": "Who wrote 'Romeo and Juliet'?"}, {"role": "assistant", "content": "William Shakespeare"}]}
+{"messages": [{"role": "system", "content": "MedBOT est un chatbot qui aide les internes à préparer leurs concours."}, {"role": "user", "content": "How far is the Moon from Earth?"}, {"role": "assistant", "content": "Around 384,400 kilometers."}]}
