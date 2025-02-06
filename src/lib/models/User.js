@@ -147,7 +147,7 @@ router.post("/api/verifyRoleAdmin", async (req,res) => {
     if (user.role != "admin") {
       return res.status(401).json({error: "User not admin"});
     }
-    res.json({message: "User is admin", sucess: true});
+    res.json({message: "User is admin", success: true});
   } catch (error) {
     res.status(500).json({error: "Failed to verify role"})
   }
