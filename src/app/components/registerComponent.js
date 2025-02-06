@@ -32,6 +32,7 @@ export default function RegisterPage() {
         throw new Error(data.error);
         return;}
       setSuccess("Compte bien créé")
+      return
     } catch (error) {
       setError(error.message);
     }
@@ -62,12 +63,17 @@ export default function RegisterPage() {
           required
           className="p-2 border border-gray-300 rounded-md"
         />
+       <div className="flex justify-center">
         <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
           Register
         </button>
+        <button onClick={() => router.push("/login")} className="bg-red-500 text-white p-2 rounded-md">
+          Login
+        </button>
+        </div>
       </form>
       {error && <p className="text-red-500 mt-2">{error}</p>}
-      {error && <p className="text-green-500 mt-2">{success}</p>}
+      {success  && <p className="text-green-500 mt-2">{success}</p>}
     </div>
     </div>
   );

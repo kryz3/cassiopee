@@ -18,7 +18,7 @@ export default function ProfilePage() {
         const response = await fetch("http://localhost:5001/User/api/getUser", {
           method: "POST", // Use POST if sending a body, or use query params in GET
           headers: { "Content-Type": "application/json" },
-          credentials: "include", 
+          
           body: JSON.stringify({ id: userID }), // Correctly format body
         });
         const data = await response.json();
@@ -44,16 +44,7 @@ export default function ProfilePage() {
       <h2 className="text-2xl font-bold">Profile Page</h2>
       <p className="mt-4">Email: {user.email}</p>
       <p>Role: {user.role}</p>
-      <button
-        onClick={() => {
-          document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-          localStorage.clear();
-          router.push("/"); 
-        }}
-        className="mt-4 bg-red-500 text-white p-2 rounded-md"
-      >
-        Logout
-      </button>
+
     </div>
   );
 }

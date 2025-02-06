@@ -34,8 +34,12 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userID", data.id);
 
+
       // Redirect to profile page on success
+      
       router.push("/profile");
+
+      
     } catch (error) {
       console.log(error.message);
 
@@ -61,9 +65,14 @@ export default function LoginPage() {
           required
           className="p-2 border border-gray-300 rounded-md"
         />
+        <div className="flex justify-center">
         <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
           Login
         </button>
+        <button onClick={() => router.push("/register")} className="bg-red-500 text-white p-2 rounded-md">
+          Register
+        </button>
+        </div>
       </form>
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>

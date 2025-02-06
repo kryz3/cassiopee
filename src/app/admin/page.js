@@ -29,7 +29,6 @@ export default function Home() {
 
   return (
     <>
-      <h1>Questions Handler</h1>
       {error && <p style={{ color: "red" }}>Error: {error}</p>}
       <QAForm setQAs={setQAs} />
       <QAList QAs={QAs} setQAs={setQAs} />
