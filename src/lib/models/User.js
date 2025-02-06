@@ -24,7 +24,6 @@ router.get("/api/getUsers", async (req, res) => {
 });
 
 const bcrypt = require("bcrypt");
-const { clearPreviewData } = require("next/dist/server/api-utils");
 
 
 router.post("/api/loginUser", async (req, res) => {
@@ -43,11 +42,13 @@ router.post("/api/loginUser", async (req, res) => {
       return res.status(401).json({ error: "Incorrect password" });
     }
 
+
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       "your_secret_key",
       { expiresIn: "10h" }
     );
+
 
     res.cookie("authToken", token, {
       httpOnly: true,
@@ -55,6 +56,7 @@ router.post("/api/loginUser", async (req, res) => {
       sameSite: "Strict",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
+
 
     res.json({
       success: true,
@@ -124,7 +126,7 @@ router.post("/api/getUser", async (req, res) => {
   try {
     const { id } = req.body;
 
-    const user = await User.findOne(id);
+    const user = await User.findOne({"_id": id});
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }

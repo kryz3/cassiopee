@@ -9,25 +9,23 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function fetchUserData() {
+ 
       const userID = localStorage.getItem("userID"); // Get user ID from localStorage
-
-      if (!userID) {
-        router.push("/"); // Redirect if user ID is missing (not authenticated)
-        return;
-      }
+    
+      
 
       try {
         const response = await fetch("http://localhost:5001/User/api/getUser", {
           method: "POST", // Use POST if sending a body, or use query params in GET
           headers: { "Content-Type": "application/json" },
-          credentials: "include", // Send cookies with request
+          credentials: "include", 
           body: JSON.stringify({ id: userID }), // Correctly format body
         });
-
-        if (!response.ok) throw new Error("Unauthorized");
-
         const data = await response.json();
-        setUser({ email: data.email, role: data.role });
+        console.log("ok")
+        if (!response.ok) throw new Error("No userid in storage ");
+
+        setUser({ email: data.user.email, role: data.user.role });
       } catch (error) {
         console.error("Authentication failed:", error);
         router.push("/"); // Redirect if not authenticated
@@ -50,7 +48,7 @@ export default function ProfilePage() {
         onClick={() => {
           document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
           localStorage.clear();
-          router.push("/");
+          router.push("/"); 
         }}
         className="mt-4 bg-red-500 text-white p-2 rounded-md"
       >

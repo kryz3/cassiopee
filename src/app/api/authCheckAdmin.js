@@ -1,26 +1,12 @@
 import { NextResponse } from "next/server";
 
 export async function middleware(req) {
-  const token = req.cookies.get("authToken"); // Read cookie from request
-  const userId = localStorage.getItem('userID');
-
-  const role = await fetch("http://localhost:5001/User/api/verifyRoleAdmin", 
-    {
-      method: "POST",
-      body: JSON.stringify({
-        id: userId
-      })
-    }
-  )
-
-  if (!role.ok) {
-    return NextResponse.direct("/")
-  }
-
+  const token = req.cookies.has("authToken"); // Read cookie from request
+    console.log("token,", token)
   if (!token) {
-
-    return NextResponse.redirect("/"); // Redirect to login if no token
+    return NextResponse.redirect("/lol"); // Redirect to login if no token
   }
+  console.non("no token in authcehck")
 
   return NextResponse.next(); // Continue if authenticated
 }

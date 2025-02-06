@@ -7,6 +7,12 @@ const QARoutes = require("./lib/models/QA")
 const userRoutes = require("./lib/models/User")
 
 const app = express();
+const corsOptions = {
+  origin: "http://localhost:3000", // Update with your frontend URL
+  credentials: true, // Allow cookies to be sent
+};
+app.use(cors(corsOptions));
+
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());

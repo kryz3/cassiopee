@@ -20,7 +20,7 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
+      console.log("ok")
       const data = await response.json();
       console.log(data, "data");
       console.log(data.id, "id")
@@ -28,11 +28,12 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userID", data.id);
       localStorage.setItem("role", data.role);
-
+      console.log(data, "adata")
       if (!response.ok) {
-        throw new Error(response.statusText);
+        throw new Error(response.message);
         return;
       }
+      console.log("try")
 
       // Redirect to profile page on success
       router.push("/profile");
