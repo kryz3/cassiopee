@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
   email: String,
   password: String,
   role: { type: String, default: "user" },
+  username: String
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -86,15 +87,17 @@ router.post("/api/setAdmin", async (req, res) => {
 
 router.post("/api/addUser", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
     const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
+    const existingUser2 = await User.findOne({ username: username });
+    if (existingUser || existingUser2 ) {
       return res.status(400).json({ error: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
+      username: username,
       email: email,
       password: hashedPassword,
     });
