@@ -8,7 +8,6 @@ const userRoutes = require("./lib/models/User")
 
 const app = express();
 
-
 const corsOptions = {
   origin: "http://localhost:3000", // Your frontend URL
   credentials: true, // Allow cookies and authentication headers
