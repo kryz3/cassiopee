@@ -42,8 +42,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <h2 className="text-2xl font-bold">Login</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 mt-4">
+      <h2 className="text-2xl font-bold text-red-700">Login</h2>
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 mt-4 ">
         <input
           type="text"
           name="email"

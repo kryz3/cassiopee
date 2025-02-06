@@ -43,20 +43,31 @@ export default function QAList({ QAs, setQAs }) {
   };
 
   return (
-    <ul>
+    <ul className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md space-y-4">
+      <h2 className="text-xl font-semibold text-black">QA List</h2>
       {QAs.map((qa) => (
-        <li key={qa._id}>
+        <li key={qa._id} className="p-4 border rounded-lg shadow-sm">
           <Accordion>
-            <AccordionItem key="1" aria-label="Accordion 1" title={qa._id}>
-              {qa.question} <br /> <br/>
-              {qa.answer} <br /> <br/>
-              {qa.Subject} <br />
-              {qa.type}
+            <AccordionItem key={qa._id} aria-label="QA Item" title={qa.question} className="text-black">
+              <p className="text-black"><strong>Answer:</strong> {qa.answer}</p>
+              <p className="text-gray-600"><strong>Subject:</strong> {qa.Subject}</p>
+              <p className="text-gray-600"><strong>Type:</strong> {qa.type}</p>
             </AccordionItem>
           </Accordion>
-          <button onClick={() => handleDelete(qa._id)}>Delete</button>
-          <button onClick={() => handleVerification(qa._id)}>Verify</button>
-          <hr />
+          <div className="flex justify-between mt-3">
+            <button
+              onClick={() => handleDelete(qa._id)}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => handleVerification(qa._id)}
+              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all"
+            >
+              {qa.Verified ? "Unverify" : "Verify"}
+            </button>
+          </div>
         </li>
       ))}
     </ul>

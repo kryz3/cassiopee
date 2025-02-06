@@ -45,16 +45,60 @@ export default function QAForm({ setQAs }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="question" placeholder="Question" value={formData.question} onChange={handleChange} required />
-      <input type="text" name="answer" placeholder="Answer" value={formData.answer} onChange={handleChange} required />
-      <input type="text" name="type" placeholder="Type" value={formData.type} onChange={handleChange} required />
-      <input type="text" name="Subject" placeholder="Subject" value={formData.Subject} onChange={handleChange} required />
-      <label>
-        Verified:
-        <input type="checkbox" name="Verified" checked={formData.Verified} onChange={handleChange} />
-      </label>
-      <button type="submit">Add QA</button>
+    <form onSubmit={handleSubmit} className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md space-y-4">
+      <h2 className="text-xl font-semibold text-gray-700">Add a New QA</h2>
+      <input
+        type="text"
+        name="question"
+        placeholder="Question"
+        value={formData.question}
+        onChange={handleChange}
+        required
+        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <input
+        type="text"
+        name="answer"
+        placeholder="Answer"
+        value={formData.answer}
+        onChange={handleChange}
+        required
+        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <input
+        type="text"
+        name="type"
+        placeholder="Type"
+        value={formData.type}
+        onChange={handleChange}
+        required
+        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <input
+        type="text"
+        name="Subject"
+        placeholder="Subject"
+        value={formData.Subject}
+        onChange={handleChange}
+        required
+        className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <div className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          name="Verified"
+          checked={formData.Verified}
+          onChange={handleChange}
+          className="w-4 h-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+        />
+        <label className="text-gray-600">Verified</label>
+      </div>
+      <button
+        type="submit"
+        className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 transition-all"
+      >
+        Add QA
+      </button>
     </form>
   );
 }
