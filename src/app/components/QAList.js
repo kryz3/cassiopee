@@ -1,4 +1,5 @@
 "use client";
+import { Accordion, AccordionItem } from "@heroui/accordion";
 
 export default function QAList({ QAs, setQAs }) {
   const handleDelete = async (id) => {
@@ -45,12 +46,14 @@ export default function QAList({ QAs, setQAs }) {
     <ul>
       {QAs.map((qa) => (
         <li key={qa._id}>
-          <strong>Id:</strong> {qa._id} <br />
-          <strong>Question:</strong> {qa.question} <br />
-          <strong>Answer:</strong> {qa.answer} <br />
-          <strong>Type:</strong> {qa.type} <br />
-          <strong>Subject:</strong> {qa.Subject} <br />
-          <strong>Verified:</strong> {qa.Verified ? "Yes" : "No"} <br />
+          <Accordion>
+            <AccordionItem key="1" aria-label="Accordion 1" title={qa._id}>
+              {qa.question} <br /> <br/>
+              {qa.answer} <br /> <br/>
+              {qa.Subject} <br />
+              {qa.type}
+            </AccordionItem>
+          </Accordion>
           <button onClick={() => handleDelete(qa._id)}>Delete</button>
           <button onClick={() => handleVerification(qa._id)}>Verify</button>
           <hr />

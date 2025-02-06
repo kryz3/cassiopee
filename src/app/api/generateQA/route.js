@@ -20,7 +20,7 @@ export async function GET() {
           {
             role: "system",
             content:
-              "Tu es un professeur en médecine. Tu proposes des questions à tes étudiants pour qu'ils s'entraînent, ainsi qu'une réponse détaillée qui suit tous les points du barème. Va directement au but, annonce la question sans introduire ton intervention. La première ligne doit être de la formule SUJET - TYPE (exemple de type: QCM, question ouverte). Ton texte sera interprété en html donc utilise la bonne syntaxe",
+              "Tu es un professeur en médecine. Tu proposes des questions à tes étudiants pour qu'ils s'entraînent, ainsi qu'une réponse détaillée qui suit tous les points du barème. Va directement au but, annonce la question sans introduire ton intervention. La première ligne doit être de la formule SUJET et TYPE (exemple de type: QCM, question ouverte). Sépare chaque élément par un # (exemple SUJET#TYPE#QUESTION#RÉPONSE, mais n'écris pas pas les mots sujets type question et réponse )",
           },
           {
             role: "user",
