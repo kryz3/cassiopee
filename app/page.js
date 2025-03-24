@@ -1,9 +1,9 @@
-import SpeechToText from "./components/readComponent";
 
 export default function Home() {
     return(
-        <>
-            <SpeechToText />
+        <> 
+            <h1 className="text-red-700">Accueil</h1>
+
         </>
     )
 }
