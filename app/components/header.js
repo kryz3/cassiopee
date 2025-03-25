@@ -24,22 +24,33 @@ export default function Header() {
           }
         );
         const data = await response.json();
-        
+
         setIsAdmin(data.success);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchAdmin()
+    fetchAdmin();
     setIsLoggedIn(!!token && !!userID);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userID");
-    setIsLoggedIn(false);
-    // Optionally redirect
-    window.location.href = "/";
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:5001/User/api/logout", {
+        method: "POST",
+        credentials: "include", // IMPORTANT: send cookies!
+      });
+  
+      // Clear anything from localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("userID");
+  
+      // Redirect or refresh
+      setIsLoggedIn(false)
+      window.location.href = "/login";
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
   };
 
   return (
@@ -71,7 +82,7 @@ export default function Header() {
                     Entrainement
                   </Link>
                 </li>
-               
+
                 <li>
                   <Link
                     href="/contact"
@@ -82,24 +93,23 @@ export default function Header() {
                 </li>
                 {isAdmin && (
                   <>
-                  <li>
-                    <Link
-                      href="/admin"
-                      className="hover:text-yellow-400 font-bold"
-                    >
-                      Admin
-                    </Link>
-                  </li>
-                   <li>
-                   <Link
-                     href="/admin/soumettre"
-                     className="hover:text-gray-400 font-bold"
-                   >
-                     Soumettre un sujet
-                   </Link>
-                 </li>
-                 </>
-                  
+                    <li>
+                      <Link
+                        href="/admin"
+                        className="hover:text-yellow-400 font-bold"
+                      >
+                        Admin
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/admin/soumettre"
+                        className="hover:text-gray-400 font-bold"
+                      >
+                        Soumettre un sujet
+                      </Link>
+                    </li>
+                  </>
                 )}
                 <li>
                   <button

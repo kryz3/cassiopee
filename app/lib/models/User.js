@@ -165,6 +165,15 @@ router.post("/api/deleteUser", async (req, res) => {
   }
 });
 
+router.post("/api/logout", (req, res) => {
+  res.clearCookie("authToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+  });
+  res.status(200).json({ message: "Logged out" });
+});
+
 router.post("/api/getUser", async (req, res) => {
   try {
     const { id } = req.body;

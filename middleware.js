@@ -16,7 +16,7 @@ export async function middleware(req) {
     const userId = payload.userId; // Extract user ID from token
 
     // If accessing /admin, check user role
-    if (req.nextUrl.pathname.startsWith("/admin", "/soumettre")) {
+    if (req.nextUrl.pathname.startsWith("/admin")) {
       const response = await fetch("http://localhost:5001/User/api/verifyRoleAdmin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,5 +41,5 @@ export async function middleware(req) {
 
 // Apply middleware to both /profile and /admin
 export const config = {
-  matcher: ["/profile", "/admin"],
+  matcher: ["/profile", "/admin/:path*"],
 };
