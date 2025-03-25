@@ -13,5 +13,5 @@ export async function middleware(req) {
 
 // Apply middleware to protect specific routes
 export const config = {
-  matcher: ["/admin"], // Protects /profile page
+  matcher: ["/admin"], 
 };

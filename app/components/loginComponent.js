@@ -32,8 +32,8 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("userID", data.id);
 
-      router.push("/");
-      window.location.reload();
+      router.push("/profile");
+
     } catch (error) {
       console.log(error.message);
     }
