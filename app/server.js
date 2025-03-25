@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser")
 const userRoutes = require("./lib/models/User")
+const ecosRoutes = require("./lib/models/Ecos")
 
 const app = express();
 
@@ -21,6 +22,7 @@ mongoose
 
 
 app.use("/User", userRoutes);
+app.use("/Ecos", ecosRoutes);
   
 
 app.listen(5001, () => console.log("Server running on port 5001"));
