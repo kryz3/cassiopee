@@ -33,6 +33,7 @@ export default function LoginPage() {
       localStorage.setItem("userID", data.id);
 
       router.push("/");
+      window.location.reload();
     } catch (error) {
       console.log(error.message);
     }
