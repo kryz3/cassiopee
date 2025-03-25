@@ -6,12 +6,14 @@ import { useRouter } from "next/navigation";
 export default function Profile() {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
+    const [newName, setNewName ] = useState("");
     const [user, setUser] = useState({
-        name: "Caca Prout",
+        username: "Caca Prout",
         email: "cacaprout@example.com",
-        avatar: "", // Commence avec une photo vide
-        testsTaken: 5,
-        grades: [85, 90, 78, 92, 88] // Exemple de notes
+        avatar: "http://localhost:3000/userdb/avatar/default.png", 
+        testsTaken: 0,
+        grades: [], // Exemple de notes
+        id: "",
     });
 
     useEffect(() => {
@@ -28,8 +30,9 @@ export default function Profile() {
             });
             const data = await response.json();
             if (!response.ok) throw new Error("No userid in storage ");
+            console.log(data)
     
-            setUser({ name: data.user.username, email: data.user.email, role: data.user.role, avatar:data.user.avatar, testsTaken: 5, grades: [85, 90, 78, 92, 88] });
+            setUser({ username: data.user.username, email: data.user.email, avatar:data.user.avatar, testsTaken: 0, grades: [], id: data.user._id });
           } catch (error) {
             console.error("Authentication failed:", error);
             router.push("/"); // Redirect if not authenticated
@@ -43,17 +46,38 @@ export default function Profile() {
         setIsEditing(true);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        if (newName != user.username && (newName)) {
+            async function changeUsername(user, newName) {
+                try {
+                  const response2 = await fetch("http://localhost:5001/User/api/changeUsername", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: user.id, username: newName }),
+                  });
+              
+                  if (!response2.ok) {
+                    throw new Error(`Server error: ${response2.status}`);
+                  }
+              
+
+                  
+
+                } catch (error) {
+                  console.error("Failed to change username", error);
+                }
+              }
+            changeUsername(user, newName)      
+            setUser((prevUser) => ({ ...prevUser, username: newName }));        
+        }
         setIsEditing(false);
         // Ici, vous enverriez normalement les données mises à jour de l'utilisateur à votre backend
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setUser((prevUser) => ({
-            ...prevUser,
-            [name]: value
-        }));
+        setNewName(e.target.value)
+        console.log(newName)
+
     };
 
     const calculateAverage = (grades) => {
@@ -63,42 +87,33 @@ export default function Profile() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center py-4">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md ">
                 <h1 className="text-2xl font-bold mb-4 text-center text-black">Profil Utilisateur</h1>
                 <div className="flex justify-center mb-4">
                     <img
-                        src="https://via.placeholder.com/150?text=No+Photo"
+                        src={user.avatar}
                         alt="Profile"
                         className="rounded-full w-24 h-24 object-cover"
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-black">Nom</label>
+                    <label className="block text-black font-bold">Nom</label>
                     {isEditing ? (
                         <input
                             type="text"
                             name="name"
-                            value={user.name}
                             onChange={handleChange}
                             className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 text-black"
                         />
                     ) : (
-                        <p className="mt-2 text-black">{user.name}</p>
+                        <p className="mt-2 text-black">{user.username}</p>
                     )}
                 </div>
                 <div className="mb-4">
-                    <label className="block text-black">Email</label>
-                    {isEditing ? (
-                        <input
-                            type="email"
-                            name="email"
-                            value={user.email}
-                            onChange={handleChange}
-                            className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 text-black"
-                        />
-                    ) : (
+                    <label className="block text-black font-bold">Email</label>
+                
                         <p className="mt-2 text-black">{user.email}</p>
-                    )}
+
                 </div>
                 {isEditing ? (
                     <button
