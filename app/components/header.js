@@ -24,7 +24,6 @@ export default function Header() {
           }
         );
         const data = await response.json();
-        if (!response.ok) throw new Error("No userid in storage ");
         
         setIsAdmin(data.success);
       } catch (error) {
@@ -72,14 +71,7 @@ export default function Header() {
                     Entrainement
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/soumettre"
-                    className="hover:text-gray-400 font-bold"
-                  >
-                    Soumettre
-                  </Link>
-                </li>
+               
                 <li>
                   <Link
                     href="/contact"
@@ -89,6 +81,7 @@ export default function Header() {
                   </Link>
                 </li>
                 {isAdmin && (
+                  <>
                   <li>
                     <Link
                       href="/admin"
@@ -97,6 +90,16 @@ export default function Header() {
                       Admin
                     </Link>
                   </li>
+                   <li>
+                   <Link
+                     href="/admin/soumettre"
+                     className="hover:text-gray-400 font-bold"
+                   >
+                     Soumettre un sujet
+                   </Link>
+                 </li>
+                 </>
+                  
                 )}
                 <li>
                   <button

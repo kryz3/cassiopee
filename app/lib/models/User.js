@@ -38,6 +38,20 @@ router.post("/api/getAvatar", async (req, res) => {
   }
 });
 
+router.post("/api/changeUsername", async (req, res) => {
+  try {
+  const { id , username } = req.body;
+  const user = await User.findOne({"_id": id});
+  if (!user) {
+    return res.status(404).json({error: "User not found"});
+  }
+  user.username = username
+  await user.save(); // Save the changes
+} catch (error) {
+  res.status(500).json({error: "Failed to fetch user to change name"});
+}
+});
+
 router.post("/api/setAvatar", async (req, res) => {
     try {
       const { id, avatar } = req.body;
