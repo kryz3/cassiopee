@@ -16,7 +16,7 @@ export async function middleware(req) {
     const userId = payload.userId; // Extract user ID from token
 
     // If accessing /admin, check user role
-    if (req.nextUrl.pathname.startsWith("/admin")) {
+    if (req.nextUrl.pathname.startsWith("/admin", "/soumettre")) {
       const response = await fetch("http://localhost:5001/User/api/verifyRoleAdmin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
