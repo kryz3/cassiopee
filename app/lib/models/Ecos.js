@@ -34,6 +34,80 @@ router.get("/api/getEcoss", async (req, res) => {
   }
 })
 
+router.post("/api/getEcosTitles", async (req, res) => {
+  try {
+    const Ecoss = await Ecos.find({}, 'title _id'); // only select 'title' and '_id'
+    res.json(Ecoss);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch Ecos's" });
+  }
+});
+
+router.post("/api/getEcosStudentInstructions", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const ecos = await Ecos.findOne({"_id": id});
+    if (!ecos) {
+      return res.status(404).json({error: "Ecos not found"})
+  }
+  res.json({
+    message: "Ecos student consigns retrieved",
+    instructions: ecos.consigneEtudiant
+  }) }  
+ catch (error) {
+  res.status(500).json({error: "Failed to retrieved Ecos student instructions"})}
+})
+
+router.post("/api/getEcosImage", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const ecos = await Ecos.findOne({"_id": id});
+    if (!ecos) {
+      return res.status(404).json({error: "Ecos not found"})
+  }
+  if (!ecos.image) { res.json({message: "Pas d'image", image:null})}
+  res.json({
+    message: "Ecos image  retrieved",
+    image: ecos.image
+  }) }  
+ catch (error) {
+  res.status(500).json({error: "Failed to retrieved Ecos image"})}
+})
+
+router.post("/api/getEcosPatientInstructions", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const ecos = await Ecos.findOne({"_id": id});
+    if (!ecos) {
+      return res.status(404).json({error: "Ecos not found"})
+  }
+  res.json({
+    message: "Ecos patient consigns retrieved",
+    instructions: ecos.consignesPourPatient
+  }) }  
+ catch (error) {
+  res.status(500).json({error: "Failed to retrieved Ecos patient instructions"})}
+})
+
+router.post("/api/getEcosGrid", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const ecos = await Ecos.findOne({"_id": id});
+    if (!ecos) {
+      return res.status(404).json({error: "Ecos not found"})
+  }
+  res.json({
+    message: "Ecos grid retrieved",
+    instructions: ecos.grilleEvaluation
+  }) }  
+ catch (error) {
+  res.status(500).json({error: "Failed to retrieved Ecos grid"})}
+})
+
 router.post("/api/addEcos", async (req, res) => {
   try {
     const newEcos = new Ecos(req.body);
@@ -43,6 +117,8 @@ router.post("/api/addEcos", async (req, res) => {
     res.status(500).json({ error: "Failed to add Ecos" });
   }
 });
+
+
 
 router.post("/api/deleteEcos", async (req, res) => {
   try {

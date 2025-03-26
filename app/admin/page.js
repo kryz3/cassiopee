@@ -126,8 +126,8 @@ export default function EcosPage() {
               className="bg-white rounded-2xl shadow-md p-6 transition hover:shadow-xl"
             >
               <h2 className="text-2xl font-semibold mb-2">{ecos.title}</h2>
-              <p className="text-gray-700 mb-1"><strong>Étudiant :</strong> {ecos.consigneEtudiant}</p>
-              <p className="text-gray-700 mb-1"><strong>Patient :</strong> {ecos.consignesPourPatient}</p>
+              <p className="text-gray-700 mb-1"><strong>Consignes étudiant :</strong> {ecos.consigneEtudiant}</p>
+              <p className="text-gray-700 mb-1"><strong>Cosignes patient :</strong> {ecos.consignesPourPatient}</p>
               {ecos.theme && (
                 <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mt-2 mb-3">
                   {ecos.theme}
@@ -160,7 +160,7 @@ export default function EcosPage() {
                 <ul className="list-disc list-inside text-gray-700">
                   {ecos.grilleEvaluation.map((item, idx) => (
                     <li key={idx}>
-                      {item.consigne} – <strong>{item.note}</strong>/10
+                      {item.consigne} – <strong>{item.note}</strong> point(s)
                     </li>
                   ))}
                 </ul>
