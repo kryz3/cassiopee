@@ -135,32 +135,51 @@ export default function AddTopic() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Generate JSON transcription
+    
+        // Generate the JSON transcription
         const transcription = generateTranscription();
-        console.log(JSON.stringify(transcription, null, 2));
-
-        // Simulate sending data to the backend
+    
         try {
-            // Replace with your actual API endpoint
-            const response = await fetch('/api/addTopic', {
+            // Step 1: Send transcription data (without image file) to API
+            const response = await fetch('http://localhost:5001/Ecos/api/addEcos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(transcription),
             });
+    
+            const data = await response.json();
+    
+            if (response.ok && data._id) {
+                // Step 2: If there's an image, upload it separately using the returned _id
+                if (image) {
+                    const formData = new FormData();
+                    formData.append('image', image);
+                    formData.append('id', data._id); // So backend knows what filename to give
 
-            if (response.ok) {
-                setMessage("Sujet ajouté avec succès!");
+    
+                    const imageResponse = await fetch('http://localhost:5001/Ecos/api/uploadImage', {
+                        method: 'POST',
+                        body: formData,
+                    });
+    
+                    if (!imageResponse.ok) {
+                        throw new Error("Échec de l'envoi de l'image");
+                    }
+                }
+    
+                setMessage("Sujet ajouté avec succès !");
                 resetForm();
             } else {
-                setMessage("Erreur lors de l'ajout du sujet.");
+                setMessage("Erreur lors de l'ajout du sujet0.");
             }
         } catch (error) {
             console.error("Error:", error);
             setMessage("Erreur lors de l'ajout du sujet.");
         }
     };
+    
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -204,18 +223,27 @@ export default function AddTopic() {
     };
 
     const generateTranscription = () => {
-        return {
+        const transcription = {
             title: title,
-            theme: theme,
             consigneEtudiant: studentInstructions,
             grilleEvaluation: evaluationGrid.map(row => ({
-                critere: row.critere,
+                consigne: row.critere,
                 note: row.note
             })),
             consignesPourPatient: patientInstructions,
-            image: image ? image.name : "", // Path (peut être vide)
         };
+    
+        if (image && image.name) {
+            transcription.image = image.name;
+        }
+    
+        if (theme) {
+            transcription.theme = theme;
+        }
+    
+        return transcription;
     };
+    
 
     const resetForm = () => {
         setTitle("");

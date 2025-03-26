@@ -73,4 +73,62 @@ router.post("/api/addGradeToThisEcos", async (req, res) => {
   }
 })
 
+const fs = require('fs');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, path.join(__dirname, '../../../', 'public', 'ecos'));
+  },
+  // Save with original name or temp name
+  filename: function (req, file, cb) {
+      cb(null, file.originalname); // or `Date.now() + path.extname(file.originalname)`
+  }
+});
+
+
+const upload = multer({ storage });
+
+router.post('/api/uploadImage', upload.single('image'), async (req, res) => {
+  const id = req.body.id;
+
+  if (!req.file || !id) {
+      return res.status(400).send("Fichier ou ID manquant");
+  }
+
+  const oldPath = req.file.path;
+  const newFilename = `ecos_${id}.png`;
+  const newPath = path.join(path.dirname(oldPath), newFilename);
+
+  // Renommer le fichier
+  fs.rename(oldPath, newPath, async (err) => {
+      if (err) {
+          console.error("Erreur lors du renommage :", err);
+          return res.status(500).send("Erreur lors du renommage du fichier");
+      }
+
+      try {
+          // Mettre à jour le champ image du document Ecos
+          const updatedEcos = await Ecos.findByIdAndUpdate(
+              id,
+              { image: newFilename },
+              { new: true } // pour retourner le document mis à jour
+          );
+
+          if (!updatedEcos) {
+              return res.status(404).send("Ecos non trouvé");
+          }
+
+          res.status(200).send({ message: 'Image uploadée avec succès', filename: newFilename });
+      } catch (updateError) {
+          console.error("Erreur lors de la mise à jour de l'image dans la base :", updateError);
+          res.status(500).send("Erreur lors de la mise à jour de l'image");
+      }
+  });
+});
+
+
 module.exports = router;
+
+
