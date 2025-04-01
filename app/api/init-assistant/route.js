@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import { assistantCache, threadCache } from "../../lib/assistantStore"
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
