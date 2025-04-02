@@ -20,6 +20,8 @@ export default function ChatComponent() {
   const [isListening, setIsListening] = useState(false);
   const [mode, setMode] = useState("write");
   const [instructions, setInstructions] = useState("");
+  const [ecosImage, setEcosImage] = useState(null);
+  const [showImage, setShowImage] = useState(false);
   const recognitionRef = useRef(null);
 
   useEffect(() => {
@@ -144,8 +146,33 @@ export default function ChatComponent() {
       );
       const data = await res.json();
       setInstructions(data.instructions || "Aucune instruction reçue.");
+      
+      // Récupérer l'image associée à l'ECOS
+      fetchEcosImage(id);
     } catch (error) {
       console.error("Erreur lors de la récupération des instructions :", error);
+    }
+  };
+  
+  const fetchEcosImage = async (id) => {
+    try {
+      const res = await fetch(
+        "http://localhost:5001/Ecos/api/getEcosImage",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        }
+      );
+      const data = await res.json();
+      if (data.image) {
+        setEcosImage(data.image);
+      } else {
+        setEcosImage(null);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'image :", error);
+      setEcosImage(null);
     }
   };
 
@@ -200,7 +227,7 @@ const res = await fetch("/api/assistant", {
   };
 
   return (
-    <div className="flex w-full h-2/3 justify-center">
+    <div className="flex w-full h-2/3 justify-center mx-5 ">
       <div className="flex flex-col w-2/3 bg-white p-4 shadow-lg h-full">
         <div className="mb-4">
           <label className="block text-gray-700 mb-2">
@@ -352,6 +379,33 @@ const res = await fetch("/api/assistant", {
     <div className="text-sm whitespace-pre-wrap text-gray-700 mb-6">
       {instructions || "Aucune instruction sélectionnée."}
     </div>
+
+    {ecosImage && (
+      <div className="mb-6">
+        {showImage ? (
+          <div className="relative">
+            <img 
+              src={`/ecos/${ecosImage}`} 
+              alt="Image ECOS" 
+              className="w-full h-auto rounded-md shadow-md" 
+            />
+            <button 
+              onClick={() => setShowImage(false)}
+              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full w-6 h-6 flex items-center justify-center text-xs"
+            >
+              ✕
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowImage(true)}
+            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md shadow-md mb-4"
+          >
+            Voir l'image de l'ECOS
+          </button>
+        )}
+      </div>
+    )}
 
     {correction && (
       <div className="mt-6 p-4 bg-gray-200 rounded-md max-h-72 overflow-y-auto">

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/claude-code": "^0.2.57",
     "axios": "^1.8.2",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
@@ -24,6 +25,7 @@
     "mongoose": "^8.13.0",
     "multer": "^1.4.5-lts.2",
     "next": "15.2.1",
+    "nodemailer": "^6.10.0",
     "openai": "^4.86.2",
     "play-sound": "^1.1.6",
     "react": "^19.0.0",
