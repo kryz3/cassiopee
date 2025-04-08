@@ -9,7 +9,6 @@ pas oublier les changements:
 -reformater la réponse de l'analyse (correction : ://)
 - nom générique / ou pas de nom, pas de [ à remplir ] 
 
-- choisir image, c'est mauvais là
 
 
 FAIS CE QUE TU PREFERES ON SEN BRANLE
