@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ElevenLabsClient } from "elevenlabs";
 
 export default function ChatComponent() {
+  const [sommePoints, setSommePoints] = useState(-1);
   const [corrected, setCorrected ] = useState(false)
   const [isAssistantReady, setIsAssistantReady] = useState(false);
   const [isClicked, setIsClick ] = useState(false)
@@ -135,7 +136,7 @@ export default function ChatComponent() {
       setIsClick(false),
       setCorrected(true)
       setCorrection(data.correction);
-    
+      setSommePoints(parseInt((correction.split('Total des points :'))[1].split('/')[0].trim()))
     } catch (error) {
       console.error("Erreur lors de la demande de correction :", error);
     }
@@ -429,10 +430,10 @@ export default function ChatComponent() {
             <div className="mt-6 p-4 bg-gray-200 rounded-md max-h-72 overflow-y-auto">
               <h3 className="font-bold mb-2 text-black ">Correction :</h3>
               {correction.split("\n").map((line, i) => (
-                <p key={i} className="text-sm text-black">
-                  {line}
-                </p>
+                <p key={i} dangerouslySetInnerHTML={{ __html: line }} className="text-sm text-black">
+                                </p>
               ))}
+
             </div>
           )}
 

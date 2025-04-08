@@ -15,7 +15,8 @@ export async function POST(req) {
     });
 
     const data = await response.json();
-    const instructions = data.instructions || data;
+    const instructions0 = data.instructions || data;
+    const instructions = instructions0 + "Tu es un chatbot IA, dans le cas où aucun nom ne t'est attribué, tu n'en donneras pas, et tu seras pas défaut un homme. Respecte les consignes, tu auras systématiquement affaire à un médecin et tu seras le patient. Ne donne pas les informations trop rapidement, attends qu'elles te le soient demandées, sauf celles qui te sont précisées à donner d'entrée de conversation.  " 
 
     const assistant = await openai.beta.assistants.create({
       name: subject,
