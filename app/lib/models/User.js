@@ -11,7 +11,18 @@ const UserSchema = new mongoose.Schema({
   password: String,
   role: { type: String, default: "user" },
   username: String,
-  avatar: { type: String, default: "http://localhost:3000/userdb/avatar/default.png" },
+  avatar: {
+    type: String,
+    default: "http://localhost:3000/userdb/avatar/default.png",
+  },
+  testsPassés: [
+    {
+      id_sujet: { type: mongoose.Schema.Types.ObjectId }, 
+      date: { type: Date, default: Date.now },
+      note: Number,
+      transcription: String
+    },
+  ],
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -26,46 +37,47 @@ router.get("/api/getUsers", async (req, res) => {
 });
 
 router.post("/api/getAvatar", async (req, res) => {
-    try {
+  try {
     const { id } = req.body;
-    const user = await User.findOne({"_id": id});
+    const user = await User.findOne({ _id: id });
     if (!user) {
-      return res.status(404).json({error: "User not found"});
+      return res.status(404).json({ error: "User not found" });
     }
-    res.json({avatar: user.avatar});
+    res.json({ avatar: user.avatar });
   } catch (error) {
-    res.status(500).json({error: "Failed to fetch avatar"});
+    res.status(500).json({ error: "Failed to fetch avatar" });
   }
 });
 
 router.post("/api/changeUsername", async (req, res) => {
   try {
-  const { id , username } = req.body;
-  const user = await User.findOne({"_id": id});
-  if (!user) {
-    return res.status(404).json({error: "User not found"});
+    const { id, username } = req.body;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    user.username = username;
+    await user.save(); // Save the changes
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch user to change name" });
   }
-  user.username = username
-  await user.save(); // Save the changes
-} catch (error) {
-  res.status(500).json({error: "Failed to fetch user to change name"});
-}
 });
 
 router.post("/api/setAvatar", async (req, res) => {
-    try {
-      const { id, avatar } = req.body;
-      const user = await User.findOne({"_id": id}) 
-      if (!user) {
-        return res.status(404).json({error: "User not found"})
-      }
-      user.avatar = avatar
-      await user.save(); // Save the changes
-  
-      res.json({sucess: true,message: "Avatar was successfully set"})
-    } catch (error) { res.status(500).json({error: "Error while setting avatar"})}
-  })
+  try {
+    const { id, avatar } = req.body;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    user.avatar = avatar;
+    await user.save(); // Save the changes
 
+    res.json({ sucess: true, message: "Avatar was successfully set" });
+  } catch (error) {
+    res.status(500).json({ error: "Error while setting avatar" });
+  }
+});
 
 router.post("/api/loginUser", async (req, res) => {
   const { email, password } = req.body;
@@ -83,13 +95,11 @@ router.post("/api/loginUser", async (req, res) => {
       return res.status(401).json({ error: "Incorrect password" });
     }
 
-
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       "your_secret_key",
       { expiresIn: "10h" }
     );
-
 
     res.cookie("authToken", token, {
       httpOnly: true,
@@ -97,7 +107,6 @@ router.post("/api/loginUser", async (req, res) => {
       sameSite: "Strict",
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
-
 
     res.json({
       success: true,
@@ -114,23 +123,25 @@ router.post("/api/loginUser", async (req, res) => {
 router.post("/api/setAdmin", async (req, res) => {
   try {
     const { id } = req.body;
-    const user = await User.findOne({"_id": id}) 
+    const user = await User.findOne({ _id: id });
     if (!user) {
-      return res.status(404).json({error: "User not found"})
+      return res.status(404).json({ error: "User not found" });
     }
-    user.role = "admin"
+    user.role = "admin";
     await user.save(); // Save the changes
 
-    res.json({sucess: true,message: "User promoted to admin"})
-  } catch (error) { res.status(500).json({error: "Error while setting Admin"})}
-})
+    res.json({ sucess: true, message: "User promoted to admin" });
+  } catch (error) {
+    res.status(500).json({ error: "Error while setting Admin" });
+  }
+});
 
 router.post("/api/addUser", async (req, res) => {
   try {
     const { username, email, password } = req.body;
     const existingUser = await User.findOne({ email: email });
     const existingUser2 = await User.findOne({ username: username });
-    if (existingUser || existingUser2 ) {
+    if (existingUser || existingUser2) {
       return res.status(400).json({ error: "User already exists" });
     }
 
@@ -154,8 +165,8 @@ router.post("/api/addUser", async (req, res) => {
 router.post("/api/deleteUser", async (req, res) => {
   try {
     const { id } = req.body;
-  
-    const user = await User.findByIdAndDelete({"_id": id});
+
+    const user = await User.findByIdAndDelete({ _id: id });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -178,7 +189,7 @@ router.post("/api/getUser", async (req, res) => {
   try {
     const { id } = req.body;
 
-    const user = await User.findOne({"_id": id});
+    const user = await User.findOne({ _id: id });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -188,23 +199,21 @@ router.post("/api/getUser", async (req, res) => {
   }
 });
 
-router.post("/api/verifyRoleAdmin", async (req,res) => {
+router.post("/api/verifyRoleAdmin", async (req, res) => {
   try {
     const { id } = req.body;
 
-    const user = await User.findOne({"_id": id});
+    const user = await User.findOne({ _id: id });
     if (!user) {
-      return res.status(404).json({error: "User not found"});
+      return res.status(404).json({ error: "User not found" });
     }
     if (user.role != "admin") {
-      return res.status(401).json({error: "User not admin"});
+      return res.status(401).json({ error: "User not admin" });
     }
-    res.json({message: "User is admin", success: true});
+    res.json({ message: "User is admin", success: true });
   } catch (error) {
-    res.status(500).json({error: "Failed to verify role"})
+    res.status(500).json({ error: "Failed to verify role" });
   }
-})
-
-
+});
 
 module.exports = router;
