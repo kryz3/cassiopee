@@ -1,9 +1,12 @@
 "use client"; // Add this if using Next.js App Router
 
 import { useEffect, useState } from "react";
+import { usePathname } from 'next/navigation';
 import Link from "next/link";
 
 export default function Header() {
+  const pathname = usePathname();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -32,7 +35,7 @@ export default function Header() {
     };
     fetchAdmin();
     setIsLoggedIn(!!token && !!userID);
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {
