@@ -2,8 +2,6 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
 const bcrypt = require("bcrypt");
 
 const UserSchema = new mongoose.Schema({
@@ -15,17 +13,54 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: "http://localhost:3000/userdb/avatar/default.png",
   },
-  testsPassés: [
+  testsHistory: [
     {
-      id_sujet: { type: mongoose.Schema.Types.ObjectId }, 
+      idSujet: { type: mongoose.Schema.Types.ObjectId },
       date: { type: Date, default: Date.now },
       note: Number,
-      transcription: String
+      transcription: [
+        {
+          role: { type: String, required: true },
+          content: { type: String, required: true },
+        },
+      ],
     },
   ],
 });
 
 const User = mongoose.model("User", UserSchema);
+
+router.post("/api/addEcosToHistory", async (req, res) => {
+  try {
+    const { id, ecos } = req.body;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    user.testsHistory.push({
+      idSujet: ecos.id,
+      note: ecos.note,
+      transcription: ecos.transcription,
+    });
+    await user.save();
+  } catch (error) {
+    res.status(500).json({ erreur: "Failed to add to history", error });
+  }
+});
+
+router.post("/api/getUserHistory", async (req,res ) => {
+  try {
+    const { id } = req.body;
+    const user = await User.findOne({ _id: id });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json({userHistory: user.testsHistory})
+    await user.save();
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch to history" });
+  }
+})
 
 router.get("/api/getUsers", async (req, res) => {
   try {

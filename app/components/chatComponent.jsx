@@ -11,11 +11,9 @@ export default function ChatComponent() {
   const [isClicked, setIsClick ] = useState(false)
   const [isTyping, setIsTyping] = useState(false);
   const [ecosOptions, setEcosOptions] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("");
-  const [selectedSubjectTitle, setSelectedSubjectTitle] = useState("");
   const [sessionId, setSessionId] = useState(null);
   const [isSubjectLocked, setIsSubjectLocked] = useState(false);
   const [correction, setCorrection] = useState(null);
@@ -26,6 +24,12 @@ export default function ChatComponent() {
   const [ecosImage, setEcosImage] = useState(null);
   const [showImage, setShowImage] = useState(false);
   const recognitionRef = useRef(null);
+  const [userID, setUserID] = useState(null);
+
+  useEffect(() => {
+    const userIDFromLocalStorage = localStorage.getItem("userID");
+    setUserID(userIDFromLocalStorage);
+  }, []);
 
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
@@ -120,6 +124,28 @@ export default function ChatComponent() {
     }
   };
 
+  const addToHistory = async () => {
+    try {
+      console.log(userID, "userID")
+      console.log(selectedSubject, "sel", sommePoints, "seum", messages, "msg")
+      const res = await fetch("http://localhost:5001/User/api/addEcosToHistory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: userID, ecos: {id: selectedSubject, note: sommePoints, transcription: messages}})
+      })
+      if (!res.ok) {
+        // Erreur côté serveur, genre 400, 500...
+        const errorData = await res.json();
+        console.error("Erreur API:", errorData);
+        return;
+      }
+  
+      const data = await res.json();
+      console.log("Ajout réussi à l'historique:", data);
+
+    } catch (error) { console.error("Erreur lors de l'ajout à l'historique de l'ECOS", error)}
+  }
+
   const requestCorrection = async () => {
     if (!messages[0]) { return null}
     setIsClick(true)
@@ -183,6 +209,7 @@ export default function ChatComponent() {
   };
 
   const sendMessage = async () => {
+    console.log(messages)
     if (corrected) { return null}
     if (!input.trim()) return;
     if (!isAssistantReady) {
@@ -249,9 +276,6 @@ export default function ChatComponent() {
               const selectedEco = ecosOptions.find(
                 (eco) => eco._id === selectedId
               );
-              if (selectedEco) {
-                setSelectedSubjectTitle(selectedEco.title);
-              }
               if (
                 window.confirm(
                   `Le sujet ${selectedEco.title} est sélectionné, continuer?`
@@ -440,7 +464,11 @@ export default function ChatComponent() {
 {!corrected && (
   <div className="p-4 border-t">
     <button
-      onClick={requestCorrection}
+      onClick={async () => {
+        await requestCorrection();
+        await addToHistory();
+      }}
+      
       className={`w-full text-white px-4 py-2 rounded-md shadow-md transition-all 
         ${isClicked ? 'bg-gray-500' : 'bg-green-500 hover:bg-green-700'}`}
     >
