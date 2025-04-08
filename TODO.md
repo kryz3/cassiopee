@@ -6,12 +6,9 @@ l'archive se fait directement après avoir appuyé sur "analyser l'écos", et ç
 
 pas oublier les changements:
 
--ajouter numéro dans soumettre
--rendre les réponses latentes, ça arrive progressivement (est en train d'écrire ...) 
--same pour la correction
 -reformater la réponse de l'analyse (correction : ://)
 - nom générique / ou pas de nom, pas de [ à remplir ] 
-- champ temporel sur sujet écos
+
 - choisir image, c'est mauvais là
 
 

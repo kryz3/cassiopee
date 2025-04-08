@@ -188,12 +188,7 @@ export default function AddTopic() {
         }
     };
 
-    const handleDocChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setDocFile(file);
-        }
-    };
+
 
     const handleEvaluationGridChange = (index, field, value) => {
         const newGrid = [...evaluationGrid];
@@ -302,7 +297,8 @@ export default function AddTopic() {
                     <div className="mb-4">
                         <label className="block text-black">Grille d'évaluation</label>
                         {evaluationGrid.map((row, index) => (
-                            <div key={index} className="flex space-x-2 mb-2">
+                            <div key={index} className="flex space-x-2 mb-2 items-center place-items-center">
+                                <p className="py-2 mt-2 text-black">{index +1}</p>
                                 <input
                                     type="text"
                                     value={row.critere}
@@ -341,28 +337,22 @@ export default function AddTopic() {
                             rows="4"
                         ></textarea>
                     </div>
+                    
+
+
                     <div className="mb-4">
-                        <label className="block text-black">Image</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 text-black"
-                        />
-                    </div>
+    <label className="block text-black">Image</label>
+    <label className="block w-full px-4 py-2 mt-2 bg-blue-500 text-white text-center rounded cursor-pointer hover:bg-blue-700">
+        {image ? image.name : 'Sélectionner une image'}
+        <input 
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            style={{ display: 'none' }}
+        />
+    </label>
+</div>
                     <button type="submit" className="w-full px-4 py-2 text-white bg-gray-800 rounded hover:bg-gray-700">Ajouter</button>
-                </form>
-                <form onSubmit={handleDocSubmit} className="mt-4">
-                    <div className="mb-4">
-                        <label className="block text-black">Importer un sujet à partir d'un fichier DOCX</label>
-                        <input
-                            type="file"
-                            accept=".docx"
-                            onChange={handleDocChange}
-                            className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 text-black"
-                        />
-                    </div>
-                    <button type="submit" className="w-full px-4 py-2 text-white bg-gray-800 rounded hover:bg-gray-700">Importer</button>
                 </form>
             </div>
         </div>

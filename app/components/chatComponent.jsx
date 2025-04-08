@@ -5,8 +5,10 @@ import { v4 as uuidv4 } from "uuid";
 import { ElevenLabsClient } from "elevenlabs";
 
 export default function ChatComponent() {
+  const [corrected, setCorrected ] = useState(false)
   const [isAssistantReady, setIsAssistantReady] = useState(false);
-
+  const [isClicked, setIsClick ] = useState(false)
+  const [isTyping, setIsTyping] = useState(false);
   const [ecosOptions, setEcosOptions] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -118,6 +120,8 @@ export default function ChatComponent() {
   };
 
   const requestCorrection = async () => {
+    if (!messages[0]) { return null}
+    setIsClick(true)
     try {
       const msg = messages.filter((message) => message.role === "user");
       const res = await fetch("/api/correction", {
@@ -128,7 +132,10 @@ export default function ChatComponent() {
 
       const data = await res.json();
       if (!data.correction) throw new Error("Erreur récupération correction");
+      setIsClick(false),
+      setCorrected(true)
       setCorrection(data.correction);
+    
     } catch (error) {
       console.error("Erreur lors de la demande de correction :", error);
     }
@@ -146,24 +153,22 @@ export default function ChatComponent() {
       );
       const data = await res.json();
       setInstructions(data.instructions || "Aucune instruction reçue.");
-      
+
       // Récupérer l'image associée à l'ECOS
       fetchEcosImage(id);
+      
     } catch (error) {
       console.error("Erreur lors de la récupération des instructions :", error);
     }
   };
-  
+
   const fetchEcosImage = async (id) => {
     try {
-      const res = await fetch(
-        "http://localhost:5001/Ecos/api/getEcosImage",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
-        }
-      );
+      const res = await fetch("http://localhost:5001/Ecos/api/getEcosImage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
       const data = await res.json();
       if (data.image) {
         setEcosImage(data.image);
@@ -177,6 +182,7 @@ export default function ChatComponent() {
   };
 
   const sendMessage = async () => {
+    if (corrected) { return null}
     if (!input.trim()) return;
     if (!isAssistantReady) {
       alert("L'assistant n'est pas encore prêt.");
@@ -187,30 +193,30 @@ export default function ChatComponent() {
 
     setMessages((prev) => [...prev, { role: "user", content: input }]);
     setInput("");
+    setIsTyping(true)
 
     try {
       const assistantId = localStorage.getItem("assistantId");
-const threadId = localStorage.getItem("threadId");
+      const threadId = localStorage.getItem("threadId");
 
-const res = await fetch("/api/assistant", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    message: input,
-    assistantId,
-    threadId,
-  }),
-});
-;
-
+      const res = await fetch("/api/assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: input,
+          assistantId,
+          threadId,
+        }),
+      });
       const data = await res.json();
       if (!data.response || !data.response[0])
         throw new Error("Invalid response");
-
+      
       setMessages((prev) => [
         ...prev,
         { role: "chatgpt", content: data.response[0].text.value },
       ]);
+      setIsTyping(false)
     } catch (error) {
       console.error("Erreur lors de l’envoi :", error);
     }
@@ -302,24 +308,36 @@ const res = await fetch("/api/assistant", {
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-2 p-4 rounded-md bg-gray-100">
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`flex ${
-                msg.role === "user" ? "justify-end" : "justify-start"
-              }`}
-            >
-              <div
-                className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
-                  msg.role === "user"
-                    ? "bg-blue-500 text-white rounded-br-none"
-                    : "bg-gray-300 text-black rounded-bl-none"
-                }`}
-              >
-                {msg.content}
-              </div>
-            </div>
-          ))}
+        {messages.map((msg, index) => (
+  <div
+    key={index}
+    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+  >
+    <div
+      className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
+        msg.role === "user"
+          ? "bg-blue-500 text-white rounded-br-none"
+          : "bg-gray-300 text-black rounded-bl-none"
+      }`}
+    >
+      {msg.content}
+    </div>
+  </div>
+))}
+
+{isTyping && (
+  <div className="flex justify-start">
+    <div className="max-w-xs px-4 py-2 rounded-2xl bg-gray-300 text-black text-sm rounded-bl-none">
+      <div className="flex space-x-1 items-center">
+        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"></span>
+      </div>
+    </div>
+  </div>
+)}
+
+
         </div>
 
         <div className="flex items-center gap-2 mt-4">
@@ -333,10 +351,10 @@ const res = await fetch("/api/assistant", {
           />
           <button
             onClick={sendMessage}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md disabled:opacity-50"
+            className={`text-white px-4 py-2 rounded-md disabled:opacity-50 ${!corrected ? "bg-blue-500" : "bg-red-500"}`}
             disabled={!isAssistantReady}
           >
-            Envoyer
+            {!corrected ? "Envoyer" : "Terminé"}
           </button>
         </div>
 
@@ -372,63 +390,66 @@ const res = await fetch("/api/assistant", {
       </div>
 
       <div className="w-1/3 bg-gray-100 border-l flex flex-col max-h-[90vh]">
-  <div className="flex-1 p-4 overflow-y-auto">
-    <h2 className="text-lg font-semibold mb-2 text-black">
-      Instructions :
-    </h2>
-    <div className="text-sm whitespace-pre-wrap text-gray-700 mb-6">
-      {instructions || "Aucune instruction sélectionnée."}
-    </div>
-
-    {ecosImage && (
-      <div className="mb-6">
-        {showImage ? (
-          <div className="relative">
-            <img 
-              src={`/ecos/${ecosImage}`} 
-              alt="Image ECOS" 
-              className="w-full h-auto rounded-md shadow-md" 
-            />
-            <button 
-              onClick={() => setShowImage(false)}
-              className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full w-6 h-6 flex items-center justify-center text-xs"
-            >
-              ✕
-            </button>
+        <div className="flex-1 p-4 overflow-y-auto">
+          <h2 className="text-lg font-semibold mb-2 text-black">
+            Instructions :
+          </h2>
+          <div className="text-sm whitespace-pre-wrap text-gray-700 mb-6">
+            {instructions || "Aucune instruction sélectionnée."}
           </div>
-        ) : (
-          <button
-            onClick={() => setShowImage(true)}
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded-md shadow-md mb-4"
-          >
-            Voir l'image de l'ECOS
-          </button>
-        )}
-      </div>
-    )}
 
-    {correction && (
-      <div className="mt-6 p-4 bg-gray-200 rounded-md max-h-72 overflow-y-auto">
-        <h3 className="font-bold mb-2">Correction :</h3>
-        {correction.split("\n").map((line, i) => (
-          <p key={i} className="text-sm text-black">
-            {line}
-          </p>
-        ))}
-      </div>
-    )}
+          {ecosImage && (
+            <div className="mb-6">
+              {showImage ? (
+                <div className="relative">
+                  <img
+                    src={`/ecos/${ecosImage}`}
+                    alt="Image ECOS"
+                    className="w-full h-auto rounded-md shadow-md"
+                  />
+                  <button
+                    onClick={() => setShowImage(false)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowImage(true)}
+                  className="w-full bg-blue-500 text-white px-4 py-2 rounded-md shadow-md mb-4"
+                >
+                  Voir l'image de l'ECOS
+                </button>
+              )}
+            </div>
+          )}
 
-    <div className="p-4 border-t">
-      <button
-        onClick={requestCorrection}
-        className="w-full bg-green-500 text-white px-4 py-2 rounded-md shadow-md"
-      >
-        Analyse de l'ECOS
-      </button>
-    </div>
+          {correction && (
+            <div className="mt-6 p-4 bg-gray-200 rounded-md max-h-72 overflow-y-auto">
+              <h3 className="font-bold mb-2 text-black ">Correction :</h3>
+              {correction.split("\n").map((line, i) => (
+                <p key={i} className="text-sm text-black">
+                  {line}
+                </p>
+              ))}
+            </div>
+          )}
+
+{!corrected && (
+  <div className="p-4 border-t">
+    <button
+      onClick={requestCorrection}
+      className={`w-full text-white px-4 py-2 rounded-md shadow-md transition-all 
+        ${isClicked ? 'bg-gray-500' : 'bg-green-500 hover:bg-green-700'}`}
+    >
+      {isClicked ? "Patienter ..." : "Analyse de l'ECOS"}
+    </button>
   </div>
-</div>
+)}
 
+        </div>
+      </div>
     </div>
   );
 }

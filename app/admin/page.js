@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function EcosPage() {
   const [ecoss, setEcoss] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [themeFilter, setThemeFilter] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [visibleImages, setVisibleImages] = useState({});
 
   useEffect(() => {
-    fetch('http://localhost:5001/Ecos/api/getEcoss')
+    fetch("http://localhost:5001/Ecos/api/getEcoss")
       .then((res) => res.json())
       .then((data) => {
         const sorted = [...data].sort((a, b) => b._id.localeCompare(a._id));
@@ -20,7 +20,7 @@ export default function EcosPage() {
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Erreur lors de la récupération des ECOS:', err);
+        console.error("Erreur lors de la récupération des ECOS:", err);
         setLoading(false);
       });
   }, []);
@@ -49,32 +49,38 @@ export default function EcosPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('❗ Es-tu sûr de vouloir supprimer cet ECOS ?')) return;
+    if (!confirm("❗ Es-tu sûr de vouloir supprimer cet ECOS ?")) return;
 
     try {
-      const response = await fetch('http://localhost:5001/Ecos/api/deleteEcos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
+      const response = await fetch(
+        "http://localhost:5001/Ecos/api/deleteEcos",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        }
+      );
 
       const result = await response.json();
 
       if (response.ok) {
         setEcoss((prev) => prev.filter((e) => e._id !== id));
-        alert('✅ ECOS supprimé avec succès.');
+        alert("✅ ECOS supprimé avec succès.");
       } else {
-        alert('❌ Erreur : ' + result.error);
+        alert("❌ Erreur : " + result.error);
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
-      alert('❌ Erreur lors de la suppression.');
+      console.error("Erreur lors de la suppression:", error);
+      alert("❌ Erreur lors de la suppression.");
     }
   };
 
-  const allThemes = Array.from(new Set(ecoss.map((e) => e.theme).filter(Boolean)));
+  const allThemes = Array.from(
+    new Set(ecoss.map((e) => e.theme).filter(Boolean))
+  );
 
-  if (loading) return <div className="p-4 text-center text-black">Chargement...</div>;
+  if (loading)
+    return <div className="p-4 text-center text-black">Chargement...</div>;
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen text-black mb-10">
@@ -91,7 +97,7 @@ export default function EcosPage() {
             className="border border-gray-300 rounded-lg px-4 py-2 w-full text-black bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <select
-            value={themeFilter || ''}
+            value={themeFilter || ""}
             onChange={(e) => setThemeFilter(e.target.value || null)}
             className="border border-gray-300 rounded-lg px-4 py-2 w-full text-black bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
@@ -106,7 +112,7 @@ export default function EcosPage() {
 
         <button
           onClick={() => {
-            setSearch('');
+            setSearch("");
             setThemeFilter(null);
           }}
           className="text-sm text-blue-600 underline hover:text-blue-800 transition"
@@ -126,8 +132,12 @@ export default function EcosPage() {
               className="bg-white rounded-2xl shadow-md p-6 transition hover:shadow-xl"
             >
               <h2 className="text-2xl font-semibold mb-2">{ecos.title}</h2>
-              <p className="text-gray-700 mb-1"><strong>Consignes étudiant :</strong> {ecos.consigneEtudiant}</p>
-              <p className="text-gray-700 mb-1"><strong>Cosignes patient :</strong> {ecos.consignesPourPatient}</p>
+              <p className="text-gray-700 mb-1">
+                <strong>Consignes étudiant :</strong> {ecos.consigneEtudiant}
+              </p>
+              <p className="text-gray-700 mb-1">
+                <strong>Cosignes patient :</strong> {ecos.consignesPourPatient}
+              </p>
               {ecos.theme && (
                 <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mt-2 mb-3">
                   {ecos.theme}
@@ -140,7 +150,9 @@ export default function EcosPage() {
                     onClick={() => toggleImage(ecos._id)}
                     className="text-sm text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition"
                   >
-                    {visibleImages[ecos._id] ? 'Masquer l’image' : 'Voir l’image'}
+                    {visibleImages[ecos._id]
+                      ? "Masquer l’image"
+                      : "Voir l’image"}
                   </button>
                   {visibleImages[ecos._id] && (
                     <div className="mt-3">
@@ -160,7 +172,9 @@ export default function EcosPage() {
                 <ul className="list-disc list-inside text-gray-700">
                   {ecos.grilleEvaluation.map((item, idx) => (
                     <li key={idx}>
-                      {item.consigne} – <strong>{item.note}</strong> point(s)
+                      <strong>{idx + 1}.</strong> <span></span>
+                      {item.consigne} – <strong>{item.note}</strong> point
+                      {item.note > 1 ? "s" : ""}
                     </li>
                   ))}
                 </ul>
