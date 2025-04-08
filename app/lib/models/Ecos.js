@@ -64,9 +64,9 @@ router.post("/api/getEcosImage", async (req, res) => {
     const { id } = req.body;
 
     const ecos = await Ecos.findOne({"_id": id});
-    if (!ecos) {
-      return res.status(404).json({error: "Ecos not found"})
-  }
+    if (!ecos.image) { 
+      return res.json({message: "Pas d'image", image:null})
+    }
   if (!ecos.image) { res.json({message: "Pas d'image", image:null})}
   res.json({
     message: "Ecos image  retrieved",
