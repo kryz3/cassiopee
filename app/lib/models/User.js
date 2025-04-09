@@ -43,6 +43,7 @@ router.post("/api/addEcosToHistory", async (req, res) => {
       transcription: ecos.transcription,
     });
     await user.save();
+    res.json({ok: true})
   } catch (error) {
     res.status(500).json({ erreur: "Failed to add to history", error });
   }
@@ -57,6 +58,7 @@ router.post("/api/getUserHistory", async (req,res ) => {
     }
     res.json({userHistory: user.testsHistory})
     await user.save();
+    res.json({ok: true})
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch to history" });
   }

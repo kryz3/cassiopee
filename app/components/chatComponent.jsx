@@ -6,9 +6,9 @@ import { ElevenLabsClient } from "elevenlabs";
 
 export default function ChatComponent() {
   const [sommePoints, setSommePoints] = useState(-1);
-  const [corrected, setCorrected ] = useState(false)
+  const [corrected, setCorrected] = useState(false);
   const [isAssistantReady, setIsAssistantReady] = useState(false);
-  const [isClicked, setIsClick ] = useState(false)
+  const [isClicked, setIsClick] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [ecosOptions, setEcosOptions] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -124,31 +124,56 @@ export default function ChatComponent() {
     }
   };
 
-  const addToHistory = async () => {
+  const addToHistory = async (points) => {
     try {
-      console.log(userID, "userID")
-      console.log(selectedSubject, "sel", sommePoints, "seum", messages, "msg")
-      const res = await fetch("http://localhost:5001/User/api/addEcosToHistory", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: userID, ecos: {id: selectedSubject, note: sommePoints, transcription: messages}})
-      })
+      const res = await fetch(
+        "http://localhost:5001/User/api/addEcosToHistory",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: userID,
+            ecos: {
+              id: selectedSubject,
+              note: points,
+              transcription: messages,
+            },
+          }),
+        }
+      );
       if (!res.ok) {
         // Erreur côté serveur, genre 400, 500...
-        const errorData = await res.json();
         console.error("Erreur API:", errorData);
+        const errorData = await res.json();
+   
         return;
       }
-  
       const data = await res.json();
-      console.log("Ajout réussi à l'historique:", data);
-
-    } catch (error) { console.error("Erreur lors de l'ajout à l'historique de l'ECOS", error)}
-  }
+      console.log("somme points", points, "id", selectedSubject)
+      const res2 = await fetch("http://localhost:5001/Ecos/api/addNoteToEcos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedSubject, note: points }),
+      });
+      if (!res2.ok) {
+        // Erreur côté serveur, genre 400, 500...
+        const errorData2 = await res2.json();
+        console.error("Erreur API:", errorData2);
+        return;
+      }
+    
+      const data2 = await res2.json();
+      console.log("Ajout réussi à l'historique:", data, data2);
+    } catch (error) {
+      console.error("Erreur lors de l'ajout à l'historique de l'ECOS", error);
+    }
+  };
 
   const requestCorrection = async () => {
-    if (!messages[0]) { return null}
-    setIsClick(true)
+    if (!messages[0]) {
+      return null;
+    }
+    setIsClick(true);
     try {
       const msg = messages.filter((message) => message.role === "user");
       const res = await fetch("/api/correction", {
@@ -159,10 +184,13 @@ export default function ChatComponent() {
 
       const data = await res.json();
       if (!data.correction) throw new Error("Erreur récupération correction");
-      setIsClick(false),
-      setCorrected(true)
+      setIsClick(false), setCorrected(true);
       setCorrection(data.correction);
-      setSommePoints(parseInt((correction.split('Total des points :'))[1].split('/')[0].trim()))
+      const points = parseInt(
+        data.correction.split("Total des points :")[1].split("/")[0].trim()
+      );
+      setSommePoints(points);
+      return points
     } catch (error) {
       console.error("Erreur lors de la demande de correction :", error);
     }
@@ -183,7 +211,6 @@ export default function ChatComponent() {
 
       // Récupérer l'image associée à l'ECOS
       fetchEcosImage(id);
-      
     } catch (error) {
       console.error("Erreur lors de la récupération des instructions :", error);
     }
@@ -209,8 +236,10 @@ export default function ChatComponent() {
   };
 
   const sendMessage = async () => {
-    console.log(messages)
-    if (corrected) { return null}
+    console.log(messages);
+    if (corrected) {
+      return null;
+    }
     if (!input.trim()) return;
     if (!isAssistantReady) {
       alert("L'assistant n'est pas encore prêt.");
@@ -221,7 +250,7 @@ export default function ChatComponent() {
 
     setMessages((prev) => [...prev, { role: "user", content: input }]);
     setInput("");
-    setIsTyping(true)
+    setIsTyping(true);
 
     try {
       const assistantId = localStorage.getItem("assistantId");
@@ -239,12 +268,12 @@ export default function ChatComponent() {
       const data = await res.json();
       if (!data.response || !data.response[0])
         throw new Error("Invalid response");
-      
+
       setMessages((prev) => [
         ...prev,
         { role: "chatgpt", content: data.response[0].text.value },
       ]);
-      setIsTyping(false)
+      setIsTyping(false);
     } catch (error) {
       console.error("Erreur lors de l’envoi :", error);
     }
@@ -333,36 +362,36 @@ export default function ChatComponent() {
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-2 p-4 rounded-md bg-gray-100">
-        {messages.map((msg, index) => (
-  <div
-    key={index}
-    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-  >
-    <div
-      className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
-        msg.role === "user"
-          ? "bg-blue-500 text-white rounded-br-none"
-          : "bg-gray-300 text-black rounded-bl-none"
-      }`}
-    >
-      {msg.content}
-    </div>
-  </div>
-))}
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex ${
+                msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              <div
+                className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
+                  msg.role === "user"
+                    ? "bg-blue-500 text-white rounded-br-none"
+                    : "bg-gray-300 text-black rounded-bl-none"
+                }`}
+              >
+                {msg.content}
+              </div>
+            </div>
+          ))}
 
-{isTyping && (
-  <div className="flex justify-start">
-    <div className="max-w-xs px-4 py-2 rounded-2xl bg-gray-300 text-black text-sm rounded-bl-none">
-      <div className="flex space-x-1 items-center">
-        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-        <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"></span>
-      </div>
-    </div>
-  </div>
-)}
-
-
+          {isTyping && (
+            <div className="flex justify-start">
+              <div className="max-w-xs px-4 py-2 rounded-2xl bg-gray-300 text-black text-sm rounded-bl-none">
+                <div className="flex space-x-1 items-center">
+                  <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"></span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2 mt-4">
@@ -376,7 +405,9 @@ export default function ChatComponent() {
           />
           <button
             onClick={sendMessage}
-            className={`text-white px-4 py-2 rounded-md disabled:opacity-50 ${!corrected ? "bg-blue-500" : "bg-red-500"}`}
+            className={`text-white px-4 py-2 rounded-md disabled:opacity-50 ${
+              !corrected ? "bg-blue-500" : "bg-red-500"
+            }`}
             disabled={!isAssistantReady}
           >
             {!corrected ? "Envoyer" : "Terminé"}
@@ -454,29 +485,30 @@ export default function ChatComponent() {
             <div className="mt-6 p-4 bg-gray-200 rounded-md max-h-72 overflow-y-auto">
               <h3 className="font-bold mb-2 text-black ">Correction :</h3>
               {correction.split("\n").map((line, i) => (
-                <p key={i} dangerouslySetInnerHTML={{ __html: line }} className="text-sm text-black">
-                                </p>
+                <p
+                  key={i}
+                  dangerouslySetInnerHTML={{ __html: line }}
+                  className="text-sm text-black"
+                ></p>
               ))}
-
             </div>
           )}
 
-{!corrected && (
-  <div className="p-4 border-t">
-    <button
-      onClick={async () => {
-        await requestCorrection();
-        await addToHistory();
-      }}
-      
-      className={`w-full text-white px-4 py-2 rounded-md shadow-md transition-all 
-        ${isClicked ? 'bg-gray-500' : 'bg-green-500 hover:bg-green-700'}`}
-    >
-      {isClicked ? "Patienter ..." : "Analyse de l'ECOS"}
-    </button>
-  </div>
-)}
+          {!corrected && (
+            <div className="p-4 border-t">
+              <button
+                onClick={async () => {
+                  const points = await requestCorrection();
 
+                  await addToHistory(points);
+                }}
+                className={`w-full text-white px-4 py-2 rounded-md shadow-md transition-all 
+        ${isClicked ? "bg-gray-500" : "bg-green-500 hover:bg-green-700"}`}
+              >
+                {isClicked ? "Patienter ..." : "Analyse de l'ECOS"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

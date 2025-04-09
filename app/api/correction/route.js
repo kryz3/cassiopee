@@ -7,7 +7,7 @@ const openai = new OpenAI({
 export async function POST(req) {
   try {
     const { messages, sujet } = await req.json();
-    console.log(messages, sujet, "messages, sujet")
+ 
 
     if (!messages || messages.length === 0) {
       return Response.json({ error: "Aucun message à corriger." }, { status: 400 });
@@ -38,9 +38,7 @@ export async function POST(req) {
     const ecosGrid = gridData?.instructions;
 
     
-    console.log("ligne 42")
-    console.log(gridData)
-    console.log("ok ici ça marche ligne 42")
+
     // Formatage de la grille pour l’intégrer au prompt
     const grilleEvaluationString = ecosGrid
       .map(item => `"${item.consigne}" (${item.note} pts)`)

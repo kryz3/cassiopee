@@ -178,6 +178,12 @@ export default function EcosPage() {
                     </li>
                   ))}
                 </ul>
+                <h3 className="font-semibold mb-1 mt-3">Note moyenne :</h3>
+                <h4>
+                  {ecos.average !== null
+                    ? `${ecos.average}/${ecos.grilleEvaluation.length}`
+                    : "Non calculée"}
+                </h4>
               </div>
 
               {/* Bouton Supprimer */}

@@ -5,7 +5,6 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(req) {
   const { subject, sessionId } = await req.json();
-  console.log(subject, sessionId, "ssesion id subject");
 
   try {
     const response = await fetch("http://localhost:5001/Ecos/api/getEcosPatientInstructions", {
@@ -28,11 +27,7 @@ export async function POST(req) {
     const thread = await openai.beta.threads.create();
     threadCache[sessionId] = thread.id;
 
-    console.log("✅ Assistant initialized:", {
-      sessionId,
-      assistantId: assistant.id,
-      threadId: thread.id,
-    });
+  
 
     return Response.json({ assistantId: assistant.id, threadId: thread.id }, { status: 200 });
   } catch (error) {

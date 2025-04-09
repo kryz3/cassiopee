@@ -18,12 +18,31 @@ const EcosSchema = new mongoose.Schema({
   consignesPourPatient: { type: String, required: true },
   image: { type: String, default: null },
   theme: { type: String, default: null },
-  sumGrade: { type: Number, default: null },
-  numbGrade: { type: Number, default: null },
+  sumGrade: { type: Number, default: 0 },
+  numbGrade: { type: Number, default: 0 },
+  average: {type: Number, default: null}
 });
 
 
 const Ecos = mongoose.model("Ecos", EcosSchema)
+
+
+
+router.post("/api/addNoteToEcos", async (req, res) => {
+  try {
+    const { id, note } = req.body;
+    const ecos = await Ecos.findById(id);
+    if (!ecos) {
+      return res.status(404).json({error: "Ecos not found"})
+  }
+    ecos.numbGrade++;
+    ecos.sumGrade+= note;
+    ecos.average = ecos.sumGrade / ecos.numbGrade;
+    await ecos.save()
+
+    return res.status(200).json({ message: "Note added successfully", numbGrade: ecos.numbGrade, sumGrade: ecos.sumGrade, average: ecos.average });
+  } catch (error ) { res.status(500).json({error: "Failed to add note occurence to Ecos"})}
+ } )
 
 router.get("/api/getEcoss", async (req, res) => {
   try {
@@ -32,6 +51,17 @@ router.get("/api/getEcoss", async (req, res) => {
   } catch (error) {
     res.status(500).json({error: "Failed to fetch Ecos's"})
   }
+})
+
+router.post("/api/getEcos", async (req, res) => {
+  try {
+    const {id} = req.body;
+    const ecos = await Ecos.findById(id);
+    if (!ecos) {
+      return res.status(404).json({error: "Ecos not found"})
+  }
+  res.json({title: ecos.title, theme: ecos.theme})
+  }catch (error ) { res.status(500).json({error: "Failed to fetch Ecos"})}
 })
 
 router.post("/api/getEcosTitles", async (req, res) => {
@@ -134,24 +164,12 @@ router.post("/api/deleteEcos", async (req, res) => {
   res.status(500).json({error: "Failed to delete Ecos"})}
 })
 
-router.post("/api/addGradeToThisEcos", async (req, res) => {
-  try {
-    const { id, grade } = req.body;
-    const ecos = await Ecos.findOne({"_id": id});
-    if (!ecos) {
-      return res.status(404).json({ error: "Ecos not found" });
-    }
-    ecos.numbGrade++
-    ecos.avgGrade = (ecos.sumGrade + grade ) / ecos.numbGrade
-    await ecos.save(); // Save the changes
-  } catch (error ) {
-    res.status(500).json({error: "Couldn't add grade"})
-  }
-})
+
 
 const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
+const { escapeLeadingUnderscores } = require('typescript');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
