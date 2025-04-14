@@ -275,6 +275,7 @@ export default function ChatComponent() {
         { role: "chatgpt", content: data.response[0].text.value },
       ]);
       setIsTyping(false);
+      setInput("")
     } catch (error) {
       console.error("Erreur lors de l’envoi :", error);
     }
