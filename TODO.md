@@ -1,6 +1,6 @@
 
 situation de départ
-ajouter chronomètre du premier input à l'analyse, visible + en db
+visible + en db
 ajouter ecos aléatoire
 Si l'étudiant pose une question qui n'est pas prévue dans le sujet, réponse "non ou jsp"
 corriger le bail de synthèse vocal là c guez 

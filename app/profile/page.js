@@ -24,7 +24,7 @@ export default function Profile() {
   const [ecosData, setEcosData] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // For searching by title
   const [sortBy, setSortBy] = useState("date"); // Default sort by date
-  const [selectedTheme, setSelectedTheme] = useState(""); // For filtering by theme
+  const [selectedTheme, setSelectedTheme] = useState(""); // For filtering by situation de départ
   const [startDate, setStartDate] = useState(""); // For date range filtering
   const [endDate, setEndDate] = useState(""); // For date range filtering
   const [availableThemes, setAvailableThemes] = useState([]);
@@ -89,7 +89,7 @@ export default function Profile() {
     // Create a map to deduplicate Ecos subjects
     const uniqueEcosSubjects = new Map();
     const ecosDataArray = [];
-    const themesSet = new Set(); // To collect unique themes
+    const themesSet = new Set(); // To collect unique situations de départ
     
     // First, collect unique subject IDs
     const uniqueSubjectIds = [...new Set(testsHistory.map(test => test.idSujet?.toString()))].filter(Boolean);
@@ -114,7 +114,7 @@ export default function Profile() {
           theme: data.theme
         });
         
-        // Add theme to our set of available themes
+        // Add theme to our set of available situations de départ
         if (data.theme) {
           themesSet.add(data.theme);
         }
@@ -139,10 +139,11 @@ export default function Profile() {
         theme: subjectData.theme,
         date: test.date,
         note: test.note,
+        duration: test.duration, // Ajout de la durée
       });
     }
 
-    // Update state with fetched Ecos data and available themes
+    // Update state with fetched Ecos data and available situations de départ
     setEcosData(ecosDataArray);
     setAvailableThemes(Array.from(themesSet).sort());
   };
@@ -234,6 +235,14 @@ export default function Profile() {
   // Get the filtered and sorted data
   const displayData = filteredAndSortedEcosData();
 
+  // Fonction pour formater la durée (secondes -> MM:SS)
+  const formatDuration = (duration) => {
+    if (!duration && duration !== 0) return "Non disponible";
+    const minutes = Math.floor(duration / 60);
+    const seconds = duration % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl">
@@ -308,15 +317,15 @@ export default function Profile() {
                     />
                   </div>
 
-                  {/* Theme filter */}
+                  {/* Situation de départ filter */}
                   <div>
-                    <label className="block text-black font-semibold">Filtrer par Thème:</label>
+                    <label className="block text-black font-semibold">Filtrer par Situation de départ:</label>
                     <select
                       value={selectedTheme}
                       onChange={(e) => setSelectedTheme(e.target.value)}
                       className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 text-black"
                     >
-                      <option value="">Tous les thèmes</option>
+                      <option value="">Toutes les situations de départ</option>
                       {availableThemes.map((theme) => (
                         <option key={theme} value={theme}>
                           {theme}
@@ -359,7 +368,7 @@ export default function Profile() {
                     >
                       <option value="date">Date (plus récent d'abord)</option>
                       <option value="dateAsc">Date (plus ancien d'abord)</option>
-                      <option value="theme">Thème</option>
+                      <option value="theme">Situation de départ</option>
                       <option value="title">Titre</option>
                       <option value="note">Note</option>
                     </select>
@@ -399,7 +408,7 @@ export default function Profile() {
                                 <strong>Titre:</strong> {ecos.title}
                               </p>
                               <p>
-                                <strong>Thème:</strong> {ecos.theme}
+                                <strong>Situation de départ:</strong> {ecos.theme}
                               </p>
                               <p>
                                 <strong>Date:</strong> {new Date(ecos.date).toLocaleDateString()}
@@ -407,6 +416,11 @@ export default function Profile() {
                               {ecos.note !== undefined && (
                                 <p>
                                   <strong>Note:</strong> {ecos.note}
+                                </p>
+                              )}
+                              {ecos.duration !== undefined && (
+                                <p>
+                                  <strong>Durée:</strong> {formatDuration(ecos.duration)}
                                 </p>
                               )}
                             </div>

@@ -4,15 +4,15 @@ import { saveAs } from 'file-saver';
 
 export default function AddTopic() {
     const [title, setTitle] = useState("");
-    const [theme, setTheme] = useState("");
+    const [theme, setTheme] = useState(""); // Situation de départ
     const [studentInstructions, setStudentInstructions] = useState("");
     const [evaluationGrid, setEvaluationGrid] = useState([{ critere: "", note: "" }]);
     const [patientInstructions, setPatientInstructions] = useState("");
-    const [image, setImage] = useState(null);
+    const [images, setImages] = useState([]); // Tableau d'images au lieu d'une seule
     const [message, setMessage] = useState("");
     const [docFile, setDocFile] = useState(null);
 
-    const themes = [
+    const themes = [ // Liste des situations de départ
         "Constipation", "Diarrhée", "Distension abdominale", "Douleur abdominale",
         "Douleur anale", "Hépatomégalie", "Incontinence fécale", "Masse abdominale",
         "Masse / tuméfaction pariétale", "Méléna / rectorragie", "Régurgitation du nourrisson",
@@ -95,7 +95,7 @@ export default function AddTopic() {
         "Consultation de suivi et traitement de fond d'un patient souffrant d'un trouble psychiatrique chronique (hors dépression)",
         "Demande d'amaigrissement", "Prescription et surveillance d'une voie d'abord vasculaire", "Prescrire et réaliser une transfusion sanguine",
         "Prise en charge d'un allaitement normal et difficile", "Prise en charge d'un patient présentant une tuberculose bacillaire",
-        "Prise en charge d'une suspicion de thrombophilie", "Prise en charge d’un patient en décubitus prolongé",
+        "Prise en charge d'une suspicion de thrombophilie", "Prise en charge d'un patient en décubitus prolongé",
         "Consultation de suivi d'un patient présentant une lombalgie aiguë ou chronique", "Consultation de suivi d'une femme ménopausée",
         "Consultation de suivi d'une pathologie chronique", "Prescription d'une insulinothérapie, consultation de suivi, éducation d'un patient diabétique de type 1",
         "Prescription médicamenteuse, consultation de suivi et éducation d'un patient diabétique de type 2 ou ayant un diabète secondaire",
@@ -140,7 +140,7 @@ export default function AddTopic() {
         const transcription = generateTranscription();
     
         try {
-            // Step 1: Send transcription data (without image file) to API
+            // Step 1: Send transcription data (without image files) to API
             const response = await fetch('http://localhost:5001/Ecos/api/addEcos', {
                 method: 'POST',
                 headers: {
@@ -152,27 +152,29 @@ export default function AddTopic() {
             const data = await response.json();
     
             if (response.ok && data._id) {
-                // Step 2: If there's an image, upload it separately using the returned _id
-                if (image) {
-                    const formData = new FormData();
-                    formData.append('image', image);
-                    formData.append('id', data._id); // So backend knows what filename to give
-
-    
-                    const imageResponse = await fetch('http://localhost:5001/Ecos/api/uploadImage', {
-                        method: 'POST',
-                        body: formData,
-                    });
-    
-                    if (!imageResponse.ok) {
-                        throw new Error("Échec de l'envoi de l'image");
+                // Step 2: If there are images, upload them separately using the returned _id
+                if (images.length > 0) {
+                    // Upload each image one by one
+                    for (const image of images) {
+                        const formData = new FormData();
+                        formData.append('image', image);
+                        formData.append('id', data._id); // So backend knows what filename to give
+                        
+                        const imageResponse = await fetch('http://localhost:5001/Ecos/api/uploadImage', {
+                            method: 'POST',
+                            body: formData,
+                        });
+                        
+                        if (!imageResponse.ok) {
+                            throw new Error(`Échec de l'envoi de l'image ${image.name}`);
+                        }
                     }
                 }
     
                 setMessage("Sujet ajouté avec succès !");
                 resetForm();
             } else {
-                setMessage("Erreur lors de l'ajout du sujet0.");
+                setMessage("Erreur lors de l'ajout du sujet.");
             }
         } catch (error) {
             console.error("Error:", error);
@@ -180,15 +182,16 @@ export default function AddTopic() {
         }
     };
     
-
     const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImage(file);
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            setImages(prevImages => [...prevImages, ...files]);
         }
     };
 
-
+    const removeImage = (index) => {
+        setImages(prevImages => prevImages.filter((_, i) => i !== index));
+    };
 
     const handleEvaluationGridChange = (index, field, value) => {
         const newGrid = [...evaluationGrid];
@@ -228,8 +231,8 @@ export default function AddTopic() {
             consignesPourPatient: patientInstructions,
         };
     
-        if (image && image.name) {
-            transcription.image = image.name;
+        if (images.length > 0) {
+            transcription.images = images.map(img => img.name);
         }
     
         if (theme) {
@@ -239,14 +242,13 @@ export default function AddTopic() {
         return transcription;
     };
     
-
     const resetForm = () => {
         setTitle("");
         setTheme("");
         setStudentInstructions("");
         setEvaluationGrid([{ critere: "", note: "" }]);
         setPatientInstructions("");
-        setImage(null);
+        setImages([]);
         setDocFile(null);
     };
 
@@ -268,14 +270,14 @@ export default function AddTopic() {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-black">Thème</label>
+                        <label className="block text-black">Situation de départ</label>
                         <select
                             value={theme}
                             onChange={(e) => setTheme(e.target.value)}
                             className="w-full px-4 py-2 mt-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-gray-400 text-black"
                             required
                         >
-                            <option value="" disabled>Sélectionnez un thème</option>
+                            <option value="" disabled>Sélectionnez une situation de départ</option>
                             {themes.map((themeOption, index) => (
                                 <option key={index} value={themeOption}>
                                     {themeOption}
@@ -337,21 +339,44 @@ export default function AddTopic() {
                             rows="4"
                         ></textarea>
                     </div>
-                    
-
-
                     <div className="mb-4">
-    <label className="block text-black">Image</label>
-    <label className="block w-full px-4 py-2 mt-2 bg-blue-500 text-white text-center rounded cursor-pointer hover:bg-blue-700">
-        {image ? image.name : 'Sélectionner une image'}
-        <input 
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            style={{ display: 'none' }}
-        />
-    </label>
-</div>
+                        <label className="block text-black">Images</label>
+                        <label className="block w-full px-4 py-2 mt-2 bg-blue-500 text-white text-center rounded cursor-pointer hover:bg-blue-700">
+                            Ajouter des images
+                            <input 
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                style={{ display: 'none' }}
+                                multiple
+                            />
+                        </label>
+                        
+                        {/* Affichage des images sélectionnées */}
+                        {images.length > 0 && (
+                            <div className="mt-4 grid grid-cols-2 gap-4">
+                                {images.map((img, index) => (
+                                    <div key={index} className="relative border rounded-md p-2">
+                                        <img 
+                                            src={URL.createObjectURL(img)} 
+                                            alt={`Image ${index + 1}`} 
+                                            className="h-24 w-auto object-contain mx-auto"
+                                        />
+                                        <p className="text-xs text-center mt-1 text-gray-700 truncate" title={img.name}>
+                                            {img.name}
+                                        </p>
+                                        <button 
+                                            type="button"
+                                            onClick={() => removeImage(index)}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                     <button type="submit" className="w-full px-4 py-2 text-white bg-gray-800 rounded hover:bg-gray-700">Ajouter</button>
                 </form>
             </div>

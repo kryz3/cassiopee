@@ -160,6 +160,7 @@ export default function ChatComponent() {
             ecos: {
               id: selectedSubject,
               note: points,
+              duration: timer,
               transcription: messages,
             },
           }),
@@ -325,6 +326,43 @@ export default function ChatComponent() {
     setIsListening(!isListening);
   };
 
+  // Fonction pour sélectionner un sujet aléatoire
+  const selectRandomSubject = async () => {
+    if (ecosOptions.length === 0 || isSubjectLocked) return;
+    
+    // Sélectionner un sujet aléatoire parmi les options disponibles
+    const randomIndex = Math.floor(Math.random() * ecosOptions.length);
+    const randomSubject = ecosOptions[randomIndex];
+    
+    setSelectedSubject(randomSubject._id);
+    
+    if (window.confirm(`Le sujet "${randomSubject.title}" a été sélectionné aléatoirement, continuer?`)) {
+      setIsSubjectLocked(true);
+      fetchInstructions(randomSubject._id);
+
+      setIsAssistantReady(false);
+
+      const res = await fetch("/api/init-assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: randomSubject._id,
+          sessionId,
+        }),
+      });
+
+      if (res.ok) {
+        const { assistantId, threadId } = await res.json();
+        localStorage.setItem("assistantId", assistantId);
+        localStorage.setItem("threadId", threadId);
+        setIsAssistantReady(true);
+      } else {
+        alert("Erreur lors de l'initialisation de l'assistant.");
+      }
+    } else {
+      setSelectedSubject("");
+    }
+  };
 
   return (
     <div className="flex w-full h-2/3 justify-center mx-5 ">
@@ -333,58 +371,67 @@ export default function ChatComponent() {
           <label className="block text-gray-700 mb-2">
             Sélectionnez un sujet :
           </label>
-          <select
-            className="w-full p-2 border rounded-md text-black"
-            value={selectedSubject}
-            onChange={async (e) => {
-              const selectedId = e.target.value;
-              setSelectedSubject(selectedId);
-              const selectedEco = ecosOptions.find(
-                (eco) => eco._id === selectedId
-              );
-              if (
-                window.confirm(
-                  `Le sujet ${selectedEco.title} est sélectionné, continuer?`
-                )
-              ) {
-                setIsSubjectLocked(true);
-                fetchInstructions(selectedId);
+          <div className="flex gap-2">
+            <select
+              className="flex-1 p-2 border rounded-md text-black"
+              value={selectedSubject}
+              onChange={async (e) => {
+                const selectedId = e.target.value;
+                setSelectedSubject(selectedId);
+                const selectedEco = ecosOptions.find(
+                  (eco) => eco._id === selectedId
+                );
+                if (
+                  window.confirm(
+                    `Le sujet ${selectedEco.title} est sélectionné, continuer?`
+                  )
+                ) {
+                  setIsSubjectLocked(true);
+                  fetchInstructions(selectedId);
 
-                setIsAssistantReady(false); // Reset in case
+                  setIsAssistantReady(false); // Reset in case
 
-                const res = await fetch("/api/init-assistant", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    subject: selectedId,
-                    sessionId,
-                  }),
-                });
+                  const res = await fetch("/api/init-assistant", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      subject: selectedId,
+                      sessionId,
+                    }),
+                  });
 
-                if (res.ok) {
-                  const { assistantId, threadId } = await res.json();
+                  if (res.ok) {
+                    const { assistantId, threadId } = await res.json();
 
-                  // Save for reuse
-                  localStorage.setItem("assistantId", assistantId);
-                  localStorage.setItem("threadId", threadId);
+                    // Save for reuse
+                    localStorage.setItem("assistantId", assistantId);
+                    localStorage.setItem("threadId", threadId);
 
-                  setIsAssistantReady(true);
-                } else {
-                  alert("Erreur lors de l'initialisation de l'assistant.");
+                    setIsAssistantReady(true);
+                  } else {
+                    alert("Erreur lors de l'initialisation de l'assistant.");
+                  }
                 }
-              }
-            }}
-            disabled={isSubjectLocked}
-          >
-            <option value="" disabled>
-              Sélectionnez un sujet
-            </option>
-            {ecosOptions.map((eco) => (
-              <option key={eco._id} value={eco._id}>
-                {eco.title}
+              }}
+              disabled={isSubjectLocked}
+            >
+              <option value="" disabled>
+                Sélectionnez un sujet
               </option>
-            ))}
-          </select>
+              {ecosOptions.map((eco) => (
+                <option key={eco._id} value={eco._id}>
+                  {eco.title}
+                </option>
+              ))}
+            </select>
+            <button
+              className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-2 rounded-md shadow transition-colors disabled:opacity-50 disabled:bg-indigo-300"
+              onClick={selectRandomSubject}
+              disabled={isSubjectLocked}
+            >
+              Sujet aléatoire
+            </button>
+          </div>
           {isSubjectLocked && (
             <div className="mt-2 text-sm">
               {!isAssistantReady ? (
@@ -399,14 +446,6 @@ export default function ChatComponent() {
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-2 p-4 rounded-md bg-gray-100 relative">
-          {/* Chronomètre */}
-          {(isTimerRunning || timer > 0) && (
-            <div className="absolute top-2 right-2 bg-gray-800 text-white px-3 py-1 rounded-md shadow-md flex items-center space-x-1">
-              <span className="text-sm font-mono">{formatTime(timer)}</span>
-              {isTimerRunning && <span className="text-red-500 animate-pulse">●</span>}
-            </div>
-          )}
-          
           {messages.map((msg, index) => (
             <div
               key={index}
@@ -458,6 +497,16 @@ export default function ChatComponent() {
             {!corrected ? "Envoyer" : "Terminé"}
           </button>
         </div>
+
+        {/* Chronomètre placé en bas */}
+        {(isTimerRunning || timer > 0) && (
+          <div className="flex justify-center mt-2">
+            <div className="bg-gray-800 text-white px-3 py-1 rounded-md shadow-md flex items-center space-x-1">
+              <span className="font-mono">{formatTime(timer)}</span>
+              {isTimerRunning && <span className="text-red-500 animate-pulse">●</span>}
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-center gap-4 mt-4">
           <button

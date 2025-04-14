@@ -18,6 +18,7 @@ const UserSchema = new mongoose.Schema({
       idSujet: { type: mongoose.Schema.Types.ObjectId },
       date: { type: Date, default: Date.now },
       note: Number,
+      duration: Number,
       transcription: [
         {
           role: { type: String, required: true },
@@ -40,6 +41,7 @@ router.post("/api/addEcosToHistory", async (req, res) => {
     user.testsHistory.push({
       idSujet: ecos.id,
       note: ecos.note,
+      duration: ecos.duration,
       transcription: ecos.transcription,
     });
     await user.save();
