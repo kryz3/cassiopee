@@ -76,6 +76,7 @@ export default function ChatComponent() {
     }
   }, []);
 
+
   useEffect(() => {
     const fetchEcosTitles = async () => {
       try {
@@ -172,7 +173,7 @@ export default function ChatComponent() {
         return;
       }
       const data = await res.json();
-      console.log("somme points", points, "id", selectedSubject)
+
       const res2 = await fetch("http://localhost:5001/Ecos/api/addNoteToEcos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -186,7 +187,7 @@ export default function ChatComponent() {
       }
     
       const data2 = await res2.json();
-      console.log("Ajout réussi à l'historique:", data, data2);
+
     } catch (error) {
       console.error("Erreur lors de l'ajout à l'historique de l'ECOS", error);
     }
@@ -265,7 +266,7 @@ export default function ChatComponent() {
   };
 
   const sendMessage = async () => {
-    console.log(messages);
+
     if (corrected) {
       return null;
     }
@@ -308,6 +309,7 @@ export default function ChatComponent() {
         { role: "chatgpt", content: data.response[0].text.value },
       ]);
       setIsTyping(false);
+      setInput("")
     } catch (error) {
       console.error("Erreur lors de l'envoi :", error);
     }
@@ -322,6 +324,7 @@ export default function ChatComponent() {
     }
     setIsListening(!isListening);
   };
+
 
   return (
     <div className="flex w-full h-2/3 justify-center mx-5 ">
@@ -465,8 +468,8 @@ export default function ChatComponent() {
             }`}
             onClick={() => {
               setMode("write");
-              setIsListening(false);
-              recognitionRef.current?.stop();
+              
+              
             }}
           >
             ✍️ Écrire
@@ -479,6 +482,7 @@ export default function ChatComponent() {
             }`}
             onClick={() => {
               setMode("listen");
+              setIsListening(true)
               toggleListening();
             }}
           >
