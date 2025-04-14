@@ -25,11 +25,34 @@ export default function ChatComponent() {
   const [showImage, setShowImage] = useState(false);
   const recognitionRef = useRef(null);
   const [userID, setUserID] = useState(null);
+  const [timer, setTimer] = useState(0);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     const userIDFromLocalStorage = localStorage.getItem("userID");
     setUserID(userIDFromLocalStorage);
   }, []);
+
+  useEffect(() => {
+    if (isTimerRunning) {
+      timerRef.current = setInterval(() => {
+        setTimer(prevTimer => prevTimer + 1);
+      }, 1000);
+    }
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isTimerRunning]);
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
@@ -174,6 +197,12 @@ export default function ChatComponent() {
       return null;
     }
     setIsClick(true);
+    
+    // Arrêter le chronomètre lors de la correction
+    if (isTimerRunning) {
+      setIsTimerRunning(false);
+    }
+    
     try {
       const msg = messages.filter((message) => message.role === "user");
       const res = await fetch("/api/correction", {
@@ -247,6 +276,11 @@ export default function ChatComponent() {
     }
 
     if (!isSubjectLocked) setIsSubjectLocked(true);
+    
+    // Démarrer le chronomètre au premier message de l'utilisateur
+    if (messages.length === 0 && !isTimerRunning) {
+      setIsTimerRunning(true);
+    }
 
     setMessages((prev) => [...prev, { role: "user", content: input }]);
     setInput("");
@@ -275,7 +309,7 @@ export default function ChatComponent() {
       ]);
       setIsTyping(false);
     } catch (error) {
-      console.error("Erreur lors de l’envoi :", error);
+      console.error("Erreur lors de l'envoi :", error);
     }
   };
 
@@ -361,7 +395,15 @@ export default function ChatComponent() {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-2 p-4 rounded-md bg-gray-100">
+        <div className="flex-1 overflow-y-auto space-y-2 p-4 rounded-md bg-gray-100 relative">
+          {/* Chronomètre */}
+          {(isTimerRunning || timer > 0) && (
+            <div className="absolute top-2 right-2 bg-gray-800 text-white px-3 py-1 rounded-md shadow-md flex items-center space-x-1">
+              <span className="text-sm font-mono">{formatTime(timer)}</span>
+              {isTimerRunning && <span className="text-red-500 animate-pulse">●</span>}
+            </div>
+          )}
+          
           {messages.map((msg, index) => (
             <div
               key={index}

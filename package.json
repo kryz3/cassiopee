@@ -6,6 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "server": "node app/server.js",
+    "prod": "npm run build && npm run server & npm run start",
     "lint": "next lint"
   },
   "dependencies": {

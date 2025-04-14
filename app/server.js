@@ -17,8 +17,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 mongoose
-  .connect("mongodb://localhost:27017/mydb")
-  .then(() => console.log("Connected!"));
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/mydb")
+  .then(() => console.log("Connected to MongoDB!"))
+  .catch(err => console.error("MongoDB connection error:", err));
 
 
 app.use("/User", userRoutes);
