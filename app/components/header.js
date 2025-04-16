@@ -39,20 +39,25 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
+      // Tenter la déconnexion auprès du serveur
       await fetch("http://157.159.116.203:5001/User/api/logout", {
         method: "POST",
-        credentials: "include", // IMPORTANT: send cookies!
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        }
       });
-  
+    } catch (err) {
+      console.error("Logout failed", err);
+    } finally {
+      // Procéder à la déconnexion locale, même si la requête au serveur échoue
       // Clear anything from localStorage
       localStorage.removeItem("token");
       localStorage.removeItem("userID");
-  
+      
       // Redirect or refresh
-      setIsLoggedIn(false)
+      setIsLoggedIn(false);
       window.location.href = "/login";
-    } catch (err) {
-      console.error("Logout failed", err);
     }
   };
 
