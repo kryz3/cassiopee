@@ -66,8 +66,10 @@ router.post("/api/getUserHistory", async (req,res ) => {
   }
 })
 
-router.get("/api/getUsers", async (req, res) => {
+router.posts("/api/getUsers", async (req, res) => {
   try {
+    const pw = req.body
+    if (pw !== process.env.PWAPI) { res.status(500).json({error: "Pas le droit tricheur"})}
     const Users = await User.find();
     res.json(Users);
   } catch (error) {
