@@ -15,7 +15,7 @@ export default function Profile() {
   const [user, setUser] = useState({
     username: "",
     email: "",
-    avatar: "http://157.159.116.203:3000/userdb/avatar/default.png",
+    avatar: "http://157.159.116.203:5030/userdb/avatar/default.png",
     id: "",
     testsHistory: [],
   });
