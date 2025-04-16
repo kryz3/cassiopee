@@ -18,7 +18,7 @@ export default function Header() {
     const fetchAdmin = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5001/User/api/verifyRoleAdmin",
+          "http://157.159.116.203:5001/User/api/verifyRoleAdmin",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -39,7 +39,7 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:5001/User/api/logout", {
+      await fetch("http://157.159.116.203:5001/User/api/logout", {
         method: "POST",
         credentials: "include", // IMPORTANT: send cookies!
       });
