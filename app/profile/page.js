@@ -15,7 +15,7 @@ export default function Profile() {
   const [user, setUser] = useState({
     username: "",
     email: "",
-    avatar: "http://localhost:3000/userdb/avatar/default.png",
+    avatar: "http://157.159.116.203:3000/userdb/avatar/default.png",
     id: "",
     testsHistory: [],
   });
@@ -49,7 +49,7 @@ export default function Profile() {
       }
 
       try {
-        const response = await fetch("http://localhost:5001/User/api/getUser", {
+        const response = await fetch("http://157.159.116.203:5001/User/api/getUser", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: userID }),
@@ -97,7 +97,7 @@ export default function Profile() {
     // Fetch data for each unique subject ID
     for (const subjectId of uniqueSubjectIds) {
       try {
-        const response = await fetch("http://localhost:5001/Ecos/api/getEcos", {
+        const response = await fetch("http://157.159.116.203:5001/Ecos/api/getEcos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: subjectId }),
@@ -157,7 +157,7 @@ export default function Profile() {
     if (newName && newName !== user.username) {
       try {
         const response = await fetch(
-          "http://localhost:5001/User/api/changeUsername",
+          "http://157.159.116.203:5001/User/api/changeUsername",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

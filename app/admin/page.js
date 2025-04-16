@@ -12,7 +12,7 @@ export default function EcosPage() {
   const [visibleImages, setVisibleImages] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:5001/Ecos/api/getEcoss")
+    fetch("http://157.159.116.203:5001/Ecos/api/getEcoss")
       .then((res) => res.json())
       .then((data) => {
         const sorted = [...data].sort((a, b) => b._id.localeCompare(a._id));
@@ -53,7 +53,7 @@ export default function EcosPage() {
 
     try {
       const response = await fetch(
-        "http://localhost:5001/Ecos/api/deleteEcos",
+        "http://157.159.116.203:5001/Ecos/api/deleteEcos",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

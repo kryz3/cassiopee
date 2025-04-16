@@ -141,7 +141,7 @@ export default function AddTopic() {
     
         try {
             // Step 1: Send transcription data (without image files) to API
-            const response = await fetch('http://localhost:5001/Ecos/api/addEcos', {
+            const response = await fetch('http://157.159.116.203:5001/Ecos/api/addEcos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ export default function AddTopic() {
                         formData.append('image', image);
                         formData.append('id', data._id); // So backend knows what filename to give
                         
-                        const imageResponse = await fetch('http://localhost:5001/Ecos/api/uploadImage', {
+                        const imageResponse = await fetch('http://157.159.116.203:5001/Ecos/api/uploadImage', {
                             method: 'POST',
                             body: formData,
                         });

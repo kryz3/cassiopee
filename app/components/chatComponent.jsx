@@ -81,7 +81,7 @@ export default function ChatComponent() {
     const fetchEcosTitles = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5001/Ecos/api/getEcosTitles",
+          "http://157.159.116.203:5001/Ecos/api/getEcosTitles",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -151,7 +151,7 @@ export default function ChatComponent() {
   const addToHistory = async (points) => {
     try {
       const res = await fetch(
-        "http://localhost:5001/User/api/addEcosToHistory",
+        "http://157.159.116.203:5001/User/api/addEcosToHistory",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -175,7 +175,7 @@ export default function ChatComponent() {
       }
       const data = await res.json();
 
-      const res2 = await fetch("http://localhost:5001/Ecos/api/addNoteToEcos", {
+      const res2 = await fetch("http://157.159.116.203:5001/Ecos/api/addNoteToEcos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: selectedSubject, note: points }),
@@ -230,7 +230,7 @@ export default function ChatComponent() {
   const fetchInstructions = async (id) => {
     try {
       const res = await fetch(
-        "http://localhost:5001/Ecos/api/getEcosStudentInstructions",
+        "http://157.159.116.203:5001/Ecos/api/getEcosStudentInstructions",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -249,7 +249,7 @@ export default function ChatComponent() {
 
   const fetchEcosImage = async (id) => {
     try {
-      const res = await fetch("http://localhost:5001/Ecos/api/getEcosImage", {
+      const res = await fetch("http://157.159.116.203:5001/Ecos/api/getEcosImage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),

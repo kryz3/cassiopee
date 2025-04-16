@@ -18,7 +18,7 @@ export default function RegisterPage() {
     const username = formData.get("username");
 
     try {
-      const response = await fetch("http://localhost:5001/User/api/addUser", {
+      const response = await fetch("http://157.159.116.203:5001/User/api/addUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
