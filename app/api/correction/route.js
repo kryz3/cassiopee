@@ -23,7 +23,7 @@ export async function POST(req) {
     }
 
     // Appel API pour récupérer la grille de correction
-    const gridRes = await fetch("http://localhost:5001/Ecos/api/getEcosGrid", {
+    const gridRes = await fetch("http://157.159.116.203:5001/Ecos/api/getEcosGrid", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: sujet }),
