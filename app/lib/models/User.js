@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
   username: String,
   avatar: {
     type: String,
-    default: "http://localhost:157.159.116.203:3000/userdb/avatar/default.png",
+    default: "http://157.159.116.203:3000/userdb/avatar/default.png",
   },
   testsHistory: [
     {
