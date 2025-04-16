@@ -68,8 +68,8 @@ router.post("/api/getUserHistory", async (req,res ) => {
 
 router.post("/api/getUsers", async (req, res) => {
   try {
-    const pw = req.body;
-    if (pw !== process.env.PWAPI) { res.status(500).json({error: "Pas le droit tricheur"})}
+    const { pw } = req.body;
+    if (pw !== process.env.PWAPI) { throw new Error("Mot de passe incorrect"); }
     const Users = await User.find();
     res.json(Users);
   } catch (error) {
@@ -163,7 +163,8 @@ router.post("/api/loginUser", async (req, res) => {
 
 router.post("/api/setAdmin", async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id, pw } = req.body;
+    if (pw !== process.env.PWAPI) { throw new Error("Mot de passe incorrect"); }
     const user = await User.findOne({ _id: id });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
