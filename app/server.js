@@ -8,7 +8,7 @@ const ecosRoutes = require("./lib/models/Ecos")
 const app = express();
 
 const corsOptions = {
-  origin: "http://157.159.116.203:3000", // Your frontend URL
+  origin: "http://157.159.116.203:5030", // Your frontend URL
   credentials: true, // Allow cookies and authentication headers
 };
 
